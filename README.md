@@ -15,6 +15,9 @@
 📱 Visit this Project (coming soon...)
 </p>
 
+<h2 id="layout">🎨 Layout</h2> 
+<p align="center"> <img src="https://csyxkpbavpcrhwqhcpyy.supabase.co/storage/v1/object/public/challenges/54/challenge-54-thumbnail" alt="Random Image" width="800px">
+
 <h2 id="technologies">💻 Technologies</h2>
 
 - <a href="https://es.vitejs.dev/guide/#inicia-tu-primer-proyecto-vite"> Vite </a>
