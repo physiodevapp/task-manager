@@ -6,10 +6,8 @@ export const Container = styled.article`
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1em;
-
+  background-color: ${({theme}) => theme.primary};
   border-radius: 1rem;
-  background-color: #030616;
-  color: white;
   padding: 1em;
 `
 

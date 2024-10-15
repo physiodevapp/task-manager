@@ -2,19 +2,21 @@ import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyles = createGlobalStyle`
   body {
-    background: ${({theme}) => theme.body};
-    color: ${({theme}) => theme.text};
+    background: ${({theme}) => theme.primary};
+    color: ${({theme}) => theme.tertiary};
     font-family: 'Poppins', sans-serif;
-    transition: background 0.2s ease-in, color 0.2s ease-in;
+    transition: all 0.2s ease-in-out;
   }
 `
 
 export const lightTheme = {
-  body: '#ffffff',
-  text: '#444452'
+  primary: '#ededed',
+  secondary: '#ffffff',
+  tertiary: '#444452'
 }
 
 export const darkTheme = {
-  body: '#0f172a',
-  text: '#dde4ee'
+  primary: '#030616',
+  secondary: '#2a2d32',
+  tertiary: '#dde4ee'
 }
