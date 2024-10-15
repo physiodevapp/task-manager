@@ -10,7 +10,6 @@ export const Column = styled.section`
 `
 
 export const Title = styled.h4`
-  color: white;
   position: sticky;
 
   span {
