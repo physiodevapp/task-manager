@@ -22,7 +22,7 @@ export const SideArea = styled.aside`
   height: 100%;
   display: flex;
   flex-direction: row;
-  align-content: space-around;
+  align-content: space-between;
   flex-wrap: wrap;
   border-radius: 1rem;
   background-color: ${({theme}) => theme.primary};
@@ -57,6 +57,10 @@ export const ThemeButton = styled(ActionButton)`
   background-color: transparent;
   color: ${({theme}) => theme.tertiary};
 
+  &:hover {
+    cursor: pointer;
+  }
+
   svg {
     font-size: 1.4em;
     margin-right: 0.2em;
@@ -75,4 +79,36 @@ export const CurrentThemeMarker = styled.span`
   width: calc(50% - 0.6em);
   transition: all 0.3s ease-out;
   opacity: ${({$isDarkMode}) => $isDarkMode ? 1 : 0.2}
+`
+
+export const BoardListContainer = styled.div`
+  width: 100%;
+`
+
+export const BoardListTitle = styled.h4`
+  margin: 0.4em 0em 1.4em;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+`
+
+export const BoardList = styled.ul`
+  width: 100%;
+  list-style: none;
+`
+
+export const BoardItem = styled(ActionButton)`
+  width: 100%;
+  margin: 0em 0em 1em;
+  background-color: transparent;
+  color: ${({theme}) => theme.tertiary};
+  font-size: 1.2em;
+  border: ${({theme}) => `2px dotted ${theme.tertiary}`};
+  border-radius: 2em;
+
+  &:hover {
+    border-style: solid;
+    cursor: pointer;
+    font-weight: bold;
+  }
 `
