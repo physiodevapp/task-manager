@@ -4,6 +4,7 @@ import { taskListReadAllThunk } from "./taskListReadAllThunk";
 import { taskListReadOneThunk } from "./taskListReadOneThunk";
 import { RootState } from "../../app/store"
 import { taskListCreateThunk } from "./taskListCreateThunk";
+import { taskListDeleteThunk } from "./taskListDeleteThunk";
 
 interface InitialState {
   error: string | null;
@@ -75,6 +76,22 @@ export const taskListSlice = createSlice({
         state.taskItem = null;
       })
       .addCase(taskListCreateThunk.rejected, (state, action:PayloadAction<string | undefined>) => {
+        state.status = "rejected";
+
+        state.error = action.payload || "An error ocurred";
+      })
+      .addCase(taskListDeleteThunk.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(taskListDeleteThunk.fulfilled, (state, action: PayloadAction<TaskInterface | null>) => {
+        state.status = "fulfilled";
+
+        if (state.taskList && action.payload)
+          state.taskList = state.taskList.filter((item) => item.id !== action.payload?.id)
+
+        state.taskItem = null;
+      })
+      .addCase(taskListDeleteThunk.rejected, (state, action:PayloadAction<string | undefined>) => {
         state.status = "rejected";
 
         state.error = action.payload || "An error ocurred";

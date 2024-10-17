@@ -25,3 +25,11 @@ export const postItem = <T>(item: T): Promise<T> => {
     }, 2000);
   })
 }
+
+export const deleteItem = <T>(item: T): Promise<T> => {
+  return new Promise ((resolve, reject) => {
+    setTimeout(() => {
+      resolve(item);
+    }, 1000);
+  })
+}
