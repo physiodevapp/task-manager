@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { boardListReadAllThunk } from "./boardListReadAllThunk";
 import { RootState } from "../../app/store";
 import { BoardInterface } from '../../modelnterface';
+import { boardListCreateThunk } from "./boardListCreate";
 
 interface InitialState {
   error: string | null,
@@ -32,6 +33,22 @@ export const boardListSlice = createSlice({
         state.boardList = action.payload;
       })
       .addCase(boardListReadAllThunk.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.status = "rejected";
+
+        state.error = action.payload || "An error ocurred";
+      })
+      .addCase(boardListCreateThunk.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(boardListCreateThunk.fulfilled, (state, action: PayloadAction<BoardInterface | null>) => {
+        state.status = "fulfilled";
+
+        if (action.payload && state.boardList)
+          state.boardList.push(action.payload);          
+
+        state.boardItem = action.payload;
+      })
+      .addCase(boardListCreateThunk.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.status = "rejected";
 
         state.error = action.payload || "An error ocurred";
