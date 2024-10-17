@@ -26,14 +26,16 @@ export const boardListSlice = createSlice({
       .addCase(boardListReadAllThunk.pending, (state) => {
         state.status = "pending";
       })
-      .addCase(boardListReadAllThunk.fulfilled, (state, action: PayloadAction<[] | null>) => {
+      .addCase(boardListReadAllThunk.fulfilled, (state, action: PayloadAction<BoardInterface[] | null>) => {
         state.status = "fulfilled";
 
         state.boardList = action.payload;
       })
-      .addCase(boardListReadAllThunk.rejected, (state) => {
+      .addCase(boardListReadAllThunk.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.status = "rejected";
-      });
+
+        state.error = action.payload || "An error ocurred";
+      })
   },
 });
 

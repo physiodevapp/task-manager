@@ -1,6 +1,6 @@
 
 export interface BoardInterface {
-  id: string,
+  id: number,
   title: string,
   author: string
 }
