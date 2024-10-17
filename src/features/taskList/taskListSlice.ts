@@ -3,6 +3,7 @@ import { TaskInterface } from "../../modelnterface";
 import { taskListReadAllThunk } from "./taskListReadAllThunk";
 import { taskListReadOneThunk } from "./taskListReadOneThunk";
 import { RootState } from "../../app/store"
+import { taskListCreateThunk } from "./taskListCreateThunk";
 
 interface InitialState {
   error: string | null;
@@ -61,7 +62,23 @@ export const taskListSlice = createSlice({
 
           state.error = action.payload || "An error ocurred";
         }
-      );
+      )
+      .addCase(taskListCreateThunk.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(taskListCreateThunk.fulfilled, (state, action: PayloadAction<TaskInterface | null>) => {
+        state.status = "fulfilled";
+
+        if (action.payload)
+          state.taskList?.push(action.payload);
+
+        state.taskItem = null;
+      })
+      .addCase(taskListCreateThunk.rejected, (state, action:PayloadAction<string | undefined>) => {
+        state.status = "rejected";
+
+        state.error = action.payload || "An error ocurred";
+      })
   },
 });
 

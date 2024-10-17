@@ -17,3 +17,11 @@ export const getItem = <T>(id: number, list: any): Promise<T> => {
     }, 1000);
   })
 }
+
+export const postItem = <T>(item: T): Promise<T> => {
+  return new Promise ((resolve) => {
+    setTimeout(() => {
+      resolve(item);
+    }, 2000);
+  })
+}

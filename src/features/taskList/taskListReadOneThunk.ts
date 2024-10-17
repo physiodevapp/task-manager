@@ -3,7 +3,6 @@ import { TaskInterface } from "../../modelnterface";
 import { getItem } from "../apiCall";
 import taskList from "../../data/mock_taskList.json";
 
-
 export const taskListReadOneThunk = createAsyncThunk<TaskInterface, { id: number }, { rejectValue: string }>("taskList/taskListReadOne", async({ id }, { rejectWithValue }) => {
   try {
     const item = await getItem<TaskInterface>(id, taskList as TaskInterface[]);
