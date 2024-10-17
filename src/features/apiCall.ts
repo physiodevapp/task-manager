@@ -1,17 +1,17 @@
 
 
-export const getList = <T>(list: T[]): Promise<T[]> => {
+export const getList = <T>(list: T[], boardId?:number): Promise<T[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(list)
+      resolve(list.filter((item: any) => !boardId || item.boardId === boardId));
     }, 2000);
   })
 }
 
-export const getItem = <T>(id: string, list: any): Promise<T> => {
+export const getItem = <T>(id: number, list: any): Promise<T> => {
   return new Promise((resolve) => {
     setTimeout(async () => {
-      const item = list.filter((item: { id: string; }) => item.id === id);
+      const item = list.filter((item: { id: number; }) => item.id === id);
 
       resolve(item);
     }, 1000);
