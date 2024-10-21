@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ActionButton } from "../ActionButtonStyled";
+import { ActionButton } from "../../components/ActionButton.styled";
 
 
 export const Grid = styled.div`
@@ -12,10 +12,6 @@ export const Grid = styled.div`
   overflow: hidden;
   gap: 1em;
   transition: grid-template-columns 0.4s ease-in-out;
-
-  &:hover {
-    ${'' /* grid-template-columns: 0px auto; */}
-  }
 `
 
 export const SideArea = styled.aside`
@@ -26,6 +22,7 @@ export const SideArea = styled.aside`
   flex-wrap: wrap;
   border-radius: 1rem;
   background-color: ${({theme}) => theme.primary};
+  position: relative;
 `
 
 export const MainArea = styled.main`
@@ -37,8 +34,11 @@ export const MainArea = styled.main`
   padding: 1em 1em;
   overflow-y: auto;
 `
+interface ThemeContainerInterface {
+  $isDarkMode: boolean
+}
 
-export const ThemeContainer = styled.div`
+export const ThemeContainer = styled.div<ThemeContainerInterface>`
   width: 100%;
   background-color: ${({theme}) => theme.secondary};
   padding: 0.8em;
@@ -46,6 +46,18 @@ export const ThemeContainer = styled.div`
   position: relative;
   gap: 0.6em;
   display: flex;
+
+  > button:first-of-type {
+    &:hover {
+      background-color: ${({theme, $isDarkMode}) => $isDarkMode ? 'transparent' : theme.primary};
+    } 
+  }
+
+  > button:last-of-type {
+    &:hover {
+      background-color: ${({theme, $isDarkMode}) => !$isDarkMode ? 'transparent' : theme.primary};
+    } 
+  }
 `
 
 export const ThemeButton = styled(ActionButton)`  
@@ -56,6 +68,7 @@ export const ThemeButton = styled(ActionButton)`
   font-size: 1.2em;
   background-color: transparent;
   color: ${({theme}) => theme.tertiary};
+  border-radius: 0.6em;
 
   &:hover {
     cursor: pointer;
@@ -67,17 +80,21 @@ export const ThemeButton = styled(ActionButton)`
   }
 `
 
-export const CurrentThemeMarker = styled.span`
+interface CurrentThemeMarkerInterface {
+  $isDarkMode: boolean;
+}
+
+export const CurrentThemeMarker = styled.span<CurrentThemeMarkerInterface>`
   position: absolute;
   top: 50%;
-  left: 0.6em;
-  transform: ${({$isDarkMode}) => `translate(${$isDarkMode ? 0 : 100}%, -50%)`};
-  padding: 1.8em;
-  border-radius: 1em;
+  left: 0.7em;
+  transform: ${({$isDarkMode}) => `translate(${$isDarkMode ? 0 : 105}%, -50%)`};
+  padding: 1.6em;
+  border-radius: 0.8em;
   border: ${({theme}) => `2px solid ${theme.tertiary}`};
   background-color: transparent;
-  width: calc(50% - 0.6em);
-  transition: all 0.3s ease-out;
+  width: calc(50% - 0.9em);
+  transition: all 0.4s ease-out;
   opacity: ${({$isDarkMode}) => $isDarkMode ? 1 : 0.2}
 `
 
@@ -95,20 +112,50 @@ export const BoardListTitle = styled.h4`
 export const BoardList = styled.ul`
   width: 100%;
   list-style: none;
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 `
 
-export const BoardItem = styled(ActionButton)`
+interface BoardItemInterface {
+  $active: boolean
+}
+
+export const BoardItem = styled(ActionButton)<BoardItemInterface>`
   width: 100%;
   margin: 0em 0em 1em;
-  background-color: transparent;
+  background-color: ${({theme, $active}) => `${$active ? theme.secondary: 'transparent'}`};
   color: ${({theme}) => theme.tertiary};
   font-size: 1.2em;
-  border: ${({theme}) => `2px dotted ${theme.tertiary}`};
+  border: ${({theme, $active}) => `2px ${$active ? 'solid' : 'dotted'} ${theme.tertiary}`};
   border-radius: 2em;
 
-  &:hover {
+
+  &:not(:disabled):hover {
     border-style: solid;
     cursor: pointer;
     font-weight: bold;
+  }
+`
+
+export const AddBoard = styled(ActionButton)`
+  width: 100%;
+  background-color: transparent;
+  color: ${({theme}) => theme.tertiary};
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2em;
+  border-radius: 2em;
+
+  svg {
+    margin-right: 0.6em;
+  }
+
+  &:not(:disabled):hover {
+    cursor: pointer;
+    background-color: ${({theme}) => theme.secondary}
   }
 `

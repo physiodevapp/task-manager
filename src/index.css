@@ -4,6 +4,14 @@ html,
   margin: 0;
   padding: 0;
 }
+
 body {
   min-width: 320px;
+  background-color: #ededed;
+  color: #444452;
+}
+
+.dark-mode body {
+  background-color: #030616;
+  color: #dde4ee;
 }
