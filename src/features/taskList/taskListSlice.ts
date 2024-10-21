@@ -119,7 +119,7 @@ export const taskListSlice = createSlice({
 });
 
 
-export const taskListStatusSelector = (state: RootState) => state.taskList.status;
-export const taskListErrorSelector = (state: RootState) => state.taskList.error;
-export const taskListTaskList = (state: RootState) => state.taskList.taskList;
-export const taskListTaskItem = (state: RootState) => state.taskList.taskItem;
+export const taskListStatusSelect = (state: RootState) => state.taskList.status;
+export const taskListErrorSelect = (state: RootState) => state.taskList.error;
+export const taskListTaskListSelect = (state: RootState) => state.taskList.taskList;
+export const taskListTaskItemSelect = (state: RootState) => state.taskList.taskItem;

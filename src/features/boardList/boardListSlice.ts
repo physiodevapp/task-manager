@@ -57,8 +57,8 @@ export const boardListSlice = createSlice({
 });
 
 export const boardListErrorSelect = (state: RootState) => state.boardList.error;
-export const baordListStatusSelect = (state: RootState) => state.boardList.status;
-export const boardListBoardList = (state: RootState) => state.boardList.boardList;
-export const bardListBoardItem = (state: RootState) => state.boardList.boardItem;
+export const boardListStatusSelect = (state: RootState) => state.boardList.status;
+export const boardListBoardListSelect = (state: RootState) => state.boardList.boardList;
+export const boardListBoardItemSelect = (state: RootState) => state.boardList.boardItem;
 
 

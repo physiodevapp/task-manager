@@ -1,6 +1,6 @@
-[{"id":1,"title":"Gerry Board","author":"gfelton0@netscape.com"},
-{"id":2,"title":"Gamaliel Board","author":"ghouson1@uiuc.edu"},
-{"id":3,"title":"Mitchel Board","author":"massante2@whitehouse.gov"},
-{"id":4,"title":"Jacquenette Board","author":"jfantham3@economist.com"},
-{"id":5,"title":"Lucretia Board","author":"lankrett4@printfriendly.com"},
-{"id":6,"title":"Aldo Board","author":"abugge5@ucla.edu"}]
+[{"id":1, "default":"false", "title":"Gerry Board","author":"gfelton0@netscape.com"},
+{"id":2, "default":"false", "title":"Gamaliel Board","author":"ghouson1@uiuc.edu"},
+{"id":3, "default":"false", "title":"Mitchel Board","author":"massante2@whitehouse.gov"},
+{"id":4, "default":"true", "title":"Jacquenette Board","author":"jfantham3@economist.com"},
+{"id":5, "default":"false", "title":"Lucretia Board","author":"lankrett4@printfriendly.com"},
+{"id":6, "default":"false", "title":"Aldo Board","author":"abugge5@ucla.edu"}]
