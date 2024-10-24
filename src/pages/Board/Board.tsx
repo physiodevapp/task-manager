@@ -1,4 +1,3 @@
-// import React from 'react';
 import {
   BoardItem,
   BoardListContainer,
@@ -11,13 +10,16 @@ import {
   ThemeButton,
   ThemeContainer,
   AddBoard,
+  ColumnTitlesContainer,
+  Title,
+  BoardArea,
 } from "./Board.styled";
 import { BoardColumn } from "../../components/BoardColumn/BoardColumn";
 import { CiDark, CiLight } from "react-icons/ci";
 import { IoIosAddCircle } from "react-icons/io";
 import { useTheme as useCustomTheme } from "../../context/theme";
 import { useTheme as useStyledTheme } from "styled-components";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   boardListStatusSelect,
   boardListBoardListSelect,
@@ -26,17 +28,29 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { boardListReadAllThunk } from "../../features/boardList/boardListReadAllThunk";
 import { GridLoader, PropagateLoader } from "react-spinners";
-import { BoardInterface } from "../../modelnterface";
+import { BoardInterface, TaskInterface } from '../../modelnterface';
 import {
   taskListErrorSelect,
   taskListStatusSelect,
   taskListTaskListSelect,
 } from "../../features/taskList/taskListSlice";
 import { taskListReadAllThunk } from "../../features/taskList/taskListReadAllThunk";
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+
+interface ColumnInterface {
+  id: string,
+  title: string,
+  tasks: TaskInterface[],
+}
+
+interface ColumnListInterface {
+  [key: string]: ColumnInterface
+}
 
 export const Board = () => {
   const [isLoadingBoardList, setIsLoadingBoardList] = useState(true);
   const [isLoadingTaskList, setIsLoadingTaskList] = useState(true);
+  const [columnList, setColumnList] = useState<ColumnListInterface | null>(null);
 
   const { isDarkMode, toggleTheme } = useCustomTheme();
   const styledTheme = useStyledTheme();
@@ -63,6 +77,50 @@ export const Board = () => {
     taskListDispatch(taskListReadAllThunk({ boardId: board.id }));
   };
 
+  const  handleDragEnd = (result: any) => {
+    const { source, destination } = result;
+    
+    if (!destination)
+      return
+
+    if (source.droppableId === destination.droppableId && source.index === destination.index)
+      return
+
+    const sourceColumn = columnList![source.droppableId];
+    const destinationColumn = columnList![destination.droppableId];
+    const sourceTaskList = [...sourceColumn.tasks];
+    const destinationTaskList = [...destinationColumn.tasks];
+
+    const [movedTask] = sourceTaskList.splice(source.index, 1);
+
+    if (sourceColumn === destinationColumn) {
+      sourceTaskList.splice(destination.index, 0, movedTask);
+
+      setColumnList({
+        ...columnList,
+        [source.droppableId]: {
+          ...sourceColumn,
+          tasks: sourceTaskList,
+        }
+      });
+    } else {
+      destinationTaskList.splice(destination.index, 0, movedTask);
+
+      setColumnList({
+        ...columnList,
+        [source.droppableId]: {
+          ...sourceColumn,
+          tasks: sourceTaskList,
+        },
+        [destination.droppableId]: {
+          ...destinationColumn,
+          tasks: destinationTaskList,
+        }
+      })
+    }
+
+  }
+
   useEffect(() => {
     boardListDispatch(boardListReadAllThunk());
   }, []);
@@ -75,6 +133,7 @@ export const Board = () => {
 
       case "pending":
         setIsLoadingBoardList(true);
+        setIsLoadingTaskList(true);
         break;
 
       case "fulfilled":
@@ -110,6 +169,43 @@ export const Board = () => {
         break;
 
       case "fulfilled":
+        setColumnList({
+          ['column-1']: {
+            id: 'column-1',
+            title: 'Backlog',
+            tasks: [...taskListTaskList!.filter(
+              (task) => task.status === "backlog"
+            ), {
+              id: -1,
+              title: '',
+              description: '',
+              boardId: 1,
+              status: 'backlog',
+            }],
+          },
+          ['column-2']: {
+            id: 'column-2',
+            title: 'In progress',
+            tasks: taskListTaskList!.filter(
+              (task) => task.status === "in_progress"
+            ),
+          },
+          ['column-3']: {
+            id: 'column-3',
+            title: 'In review',
+            tasks: taskListTaskList!.filter(
+              (task) => task.status === "in_review"
+            ),
+          },
+          ['column-4']: {
+            id: 'column-4',
+            title: 'Completed',
+            tasks: taskListTaskList!.filter(
+              (task) => task.status === "completed"
+            ),
+          },
+        });
+
         setIsLoadingTaskList(false);
         break;
 
@@ -175,7 +271,7 @@ export const Board = () => {
         </ThemeContainer>
       </SideArea>
       <MainArea>
-        {isLoadingTaskList ? (
+        {(isLoadingBoardList || isLoadingTaskList || !columnList) ? (
           <PropagateLoader
             color={styledTheme.tertiary}
             loading={isLoadingTaskList}
@@ -192,36 +288,36 @@ export const Board = () => {
             data-testid="loader"
           />
         ) : (
-          <>
-            <BoardColumn
-              title="Backlog"
-              color="red"
-              showAddButton={true}
-              tasks={taskListTaskList!.filter(
-                (task) => task.status === "backlog"
-              )}
-            />
-            <BoardColumn
-              title="In progress"
-              color="yellow"
-              tasks={taskListTaskList!.filter(
-                (task) => task.status === "in_progress"
-              )}
-            />
-            <BoardColumn
-              title="In review"
-              color="#fb3afb"
-              tasks={taskListTaskList!.filter(
-                (task) => task.status === "in_review"
-              )}
-            />
-            <BoardColumn
-              title="Completed"
-              color="#1bef1b"
-              tasks={taskListTaskList!.filter(
-                (task) => task.status === "completed"
-              )}
-            />
+          <>   
+            <ColumnTitlesContainer>
+              {
+                Object.entries(columnList).map(([columnId, columnItem]) => (
+                  <Title key={columnId} $columnId={columnId}><span/>{ columnItem.title }</Title>
+                ))
+              }            
+            </ColumnTitlesContainer>         
+            <DragDropContext onDragEnd={handleDragEnd}>
+              {
+                <BoardArea>
+                  {
+                    Object.entries(columnList).map(([columnId, columnItem]) => (
+                      <Droppable key={columnId} droppableId={columnId}>
+                        {
+                          (provided, snapshot) => (
+                            <BoardColumn
+                              {...provided.droppableProps}
+                              provided={provided}
+                              snapshot={snapshot}
+                              showAddButton={columnId === "column-1"}
+                              tasks={columnItem.tasks}/>
+                          )
+                        }
+                      </Droppable>                      
+                    ))
+                  }
+                </BoardArea>
+              }
+            </DragDropContext>
           </>
         )}
       </MainArea>

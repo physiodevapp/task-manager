@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { DefaultTheme } from "styled-components";
 import { ActionButton } from "../../components/ActionButton.styled";
 
 
@@ -28,11 +28,20 @@ export const SideArea = styled.aside`
 export const MainArea = styled.main`
   background-color: ${({theme}) => theme.secondary};
   border-radius: 1rem;
-  display: grid;
-  gap: 1em;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  padding: 1em 1em;
-  overflow-y: auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+`
+
+export const BoardArea = styled.section`
+  display: flex;
+  gap: 0.2em;
+  padding: 3em 1em 1em;
+  overflow: hidden;
+  height: 100%;
+  flex: 1;
 `
 interface ThemeContainerInterface {
   $isDarkMode: boolean
@@ -157,5 +166,48 @@ export const AddBoard = styled(ActionButton)`
   &:not(:disabled):hover {
     cursor: pointer;
     background-color: ${({theme}) => theme.secondary}
+  }
+`
+
+export const ColumnTitlesContainer = styled.ul`
+  position: absolute;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0em 1em;
+  list-style: none;
+  gap: 1em;
+`
+
+interface TitleInterface {
+  $columnId: string,
+}
+
+const setTitleColor = (columnId: string, theme: DefaultTheme): string => {
+  switch (columnId) {
+    case 'column-1':
+      return 'red';
+    case 'column-2':
+      return 'yellow'
+    case 'column-3':
+      return '#fb3afb';
+    case 'column-4':
+      return '#1bef1b';  
+    default:
+      return theme.tertiary;
+  }
+}
+
+export const Title = styled.li<TitleInterface>`
+  flex: 1;
+  padding: 1em 0em;
+
+  span {
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    background: ${({theme, $columnId}) => setTitleColor($columnId, theme)};
+    border-radius: 1em;
+    margin: 0em 0.6em 0em 0em;
   }
 `
