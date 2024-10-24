@@ -1,34 +1,20 @@
 import styled from "styled-components";
 import { ActionButton } from "../ActionButton.styled";
 
-
 export const Column = styled.section`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: 1em;
-`
+  // flex: 1;
+  // overflow-y: auto;
+  // position: relative;
+  min-height: calc(100% - 20px);
+  padding-right: 0.8em;
 
-interface TitleInterface {
-  $color: string,
-}
-
-export const Title = styled.h4<TitleInterface>`
-  position: sticky;
-
-  span {
-    display: inline-block;
-    width: 0.6em;
-    height: 0.6em;
-    background: ${({$color}) => $color};
-    border-radius: 1em;
-    margin: 0em 0.6em 0em 0em;
+  article {
+    margin: 0em 0em 1em;
   }
 `
 
 export const AddTask = styled(ActionButton)`
-width: 100%;
+  width: 100%;
   background-color: #c3dafa;
   color: #5b7bdd;
   display: inline-flex;
@@ -37,6 +23,7 @@ width: 100%;
   padding: 0.8em 1.2em;
   font-weight: bold;
   font-size: 1em;
+  transform: none !important;
 
   svg {
     font-size: 1.4em;
