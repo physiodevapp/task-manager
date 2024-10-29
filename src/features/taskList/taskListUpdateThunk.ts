@@ -12,6 +12,6 @@ export const taskListUpdateThunk = createAsyncThunk<TaskInterface, { item: TaskI
     if (error instanceof Error)
       return rejectWithValue(error.message);
     else
-      return rejectWithValue(error);
+      return rejectWithValue(error as string);
   }
 })

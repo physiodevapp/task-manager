@@ -19,7 +19,7 @@ import { CiDark, CiLight } from "react-icons/ci";
 import { IoIosAddCircle } from "react-icons/io";
 import { useTheme as useCustomTheme } from "../../context/theme";
 import { useTheme as useStyledTheme } from "styled-components";
-import { useEffect, useId, useRef, useState } from "react";
+import { createRef, RefObject, useEffect, useId, useRef, useState } from "react";
 import {
   boardListStatusSelect,
   boardListBoardListSelect,
@@ -30,12 +30,17 @@ import { boardListReadAllThunk } from "../../features/boardList/boardListReadAll
 import { GridLoader, PropagateLoader } from "react-spinners";
 import { BoardInterface, TaskInterface } from '../../modelnterface';
 import {
+  taskItemUpdate,
   taskListErrorSelect,
   taskListStatusSelect,
   taskListTaskListSelect,
 } from "../../features/taskList/taskListSlice";
 import { taskListReadAllThunk } from "../../features/taskList/taskListReadAllThunk";
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk";
+import { Scrollbars } from "react-custom-scrollbars-2";
+import { TaskForm } from "../../components/TaskForm/TaskForm";
+import { useForm } from "../../context/form";
 
 interface ColumnInterface {
   id: string,
@@ -48,9 +53,17 @@ interface ColumnListInterface {
 }
 
 export const Board = () => {
+  const { type: formType } = useForm()
   const [isLoadingBoardList, setIsLoadingBoardList] = useState(true);
   const [isLoadingTaskList, setIsLoadingTaskList] = useState(true);
   const [columnList, setColumnList] = useState<ColumnListInterface | null>(null);
+  const [itemDragged, setItemDragged] = useState<TaskInterface | null>(null);
+  const [activeBoard, setActiveBoard] = useState<BoardInterface | undefined>(
+    undefined
+  );
+
+  const scrollbarRefs = useRef<{ [key: string]: RefObject<Scrollbars> }>({});
+  const boardRef = useRef<HTMLDivElement | null>(null);
 
   const { isDarkMode, toggleTheme } = useCustomTheme();
   const styledTheme = useStyledTheme();
@@ -65,10 +78,6 @@ export const Board = () => {
   const taskListStatus = useAppSelector(taskListStatusSelect);
   const taskListError = useAppSelector(taskListErrorSelect);
 
-  const [activeBoard, setActiveBoard] = useState<BoardInterface | undefined>(
-    undefined
-  );
-
   const baseBoardId = useId();
 
   const selectBoard = (board: BoardInterface) => {
@@ -77,7 +86,7 @@ export const Board = () => {
     taskListDispatch(taskListReadAllThunk({ boardId: board.id }));
   };
 
-  const  handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: any) => {
     const { source, destination } = result;
     
     if (!destination)
@@ -92,9 +101,15 @@ export const Board = () => {
     const destinationTaskList = [...destinationColumn.tasks];
 
     const [movedTask] = sourceTaskList.splice(source.index, 1);
+    const updatedMovedTask = {
+      ...movedTask,
+      status: ["backlog", "in_progress", "in_review", "completed"][
+        Number((destination.droppableId as string).split("-").pop()) - 1
+      ],
+    };
 
     if (sourceColumn === destinationColumn) {
-      sourceTaskList.splice(destination.index, 0, movedTask);
+      sourceTaskList.splice(destination.index, 0, updatedMovedTask);
 
       setColumnList({
         ...columnList,
@@ -104,7 +119,7 @@ export const Board = () => {
         }
       });
     } else {
-      destinationTaskList.splice(destination.index, 0, movedTask);
+      destinationTaskList.splice(destination.index, 0, updatedMovedTask);
 
       setColumnList({
         ...columnList,
@@ -119,6 +134,7 @@ export const Board = () => {
       })
     }
 
+    setItemDragged(updatedMovedTask);    
   }
 
   useEffect(() => {
@@ -173,15 +189,9 @@ export const Board = () => {
           ['column-1']: {
             id: 'column-1',
             title: 'Backlog',
-            tasks: [...taskListTaskList!.filter(
+            tasks: taskListTaskList!.filter(
               (task) => task.status === "backlog"
-            ), {
-              id: -1,
-              title: '',
-              description: '',
-              boardId: 1,
-              status: 'backlog',
-            }],
+            ),
           },
           ['column-2']: {
             id: 'column-2',
@@ -205,7 +215,7 @@ export const Board = () => {
             ),
           },
         });
-
+        
         setIsLoadingTaskList(false);
         break;
 
@@ -218,6 +228,30 @@ export const Board = () => {
         break;
     }
   }, [taskListStatus]);
+
+  useEffect(() => {
+    if (itemDragged)
+      taskListDispatch(taskItemUpdate(itemDragged));
+
+  }, [itemDragged]);
+
+  useEffect(() => {
+    if (columnList)
+      Object.keys(columnList).forEach((key) => {
+        if (!scrollbarRefs.current[key])
+          scrollbarRefs.current[key] = createRef();
+      });
+  }, [columnList]);
+
+  useEffect(() => {
+    if (boardRef.current) {
+      if (formType)
+        boardRef.current.setAttribute('inert', '');
+      else 
+        boardRef.current.removeAttribute('inert');
+    }
+
+  }, [formType])
 
   return (
     <Grid>
@@ -281,7 +315,6 @@ export const Board = () => {
               margin: "0 auto",
               alignSelf: "center",
               top: "-5%",
-              gridColumn: "1 / -1",
             }}
             size={20}
             aria-label="Loading Spinner"
@@ -292,24 +325,24 @@ export const Board = () => {
             <ColumnTitlesContainer>
               {
                 Object.entries(columnList).map(([columnId, columnItem]) => (
-                  <Title key={columnId} $columnId={columnId}><span/>{ columnItem.title }</Title>
+                  <Title key={columnId} $columnId={columnId}><span/>{ `${columnItem.title} ${columnItem.tasks.length ? `(${columnItem.tasks.length})` : ''}` }</Title>
                 ))
               }            
             </ColumnTitlesContainer>         
             <DragDropContext onDragEnd={handleDragEnd}>
               {
-                <BoardArea>
+                <BoardArea ref={boardRef}>
                   {
                     Object.entries(columnList).map(([columnId, columnItem]) => (
                       <Droppable key={columnId} droppableId={columnId}>
                         {
-                          (provided, snapshot) => (
+                          (provided) => (
                             <BoardColumn
                               {...provided.droppableProps}
                               provided={provided}
-                              snapshot={snapshot}
                               showAddButton={columnId === "column-1"}
-                              tasks={columnItem.tasks}/>
+                              tasks={columnItem.tasks}
+                              scrollbarRef={scrollbarRefs.current[columnId]}/>
                           )
                         }
                       </Droppable>                      
@@ -318,6 +351,8 @@ export const Board = () => {
                 </BoardArea>
               }
             </DragDropContext>
+
+            {/* <TaskForm /> */}
           </>
         )}
       </MainArea>

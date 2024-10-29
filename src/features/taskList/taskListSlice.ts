@@ -24,7 +24,17 @@ const initialState: InitialState = {
 export const taskListSlice = createSlice({
   name: "taskList",
   initialState,
-  reducers: {},
+  reducers: {
+    taskItemUpdate: (state, action: PayloadAction<TaskInterface>) => {
+      const taskIndex = state.taskList?.findIndex((task) => task.id === action.payload.id);
+
+      if (taskIndex && taskIndex !== -1 && state.taskList) {
+        state.taskList[taskIndex] = action.payload;
+
+        state.taskItem = null;
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(taskListReadAllThunk.pending, (state) => {
@@ -118,6 +128,7 @@ export const taskListSlice = createSlice({
   },
 });
 
+export const { taskItemUpdate } = taskListSlice.actions
 
 export const taskListStatusSelect = (state: RootState) => state.taskList.status;
 export const taskListErrorSelect = (state: RootState) => state.taskList.error;
