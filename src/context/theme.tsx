@@ -1,6 +1,7 @@
 import { useState, useContext, createContext, ReactNode, useEffect } from "react";
-import { ThemeProvider } from "styled-components";
+import { ThemeProvider as StyledThemeProvider } from "styled-components";
 import { darkTheme, GlobalStyles, lightTheme } from '../styles/GloblalStyles';
+import { createTheme, ThemeProvider as MuiThemeProvider } from "@mui/material";
 
 interface ThemeContextInterface {
   isDarkMode: boolean,
@@ -35,6 +36,19 @@ export const ThemeContextProvider = ({children}: ThemeContextProviderProps) => {
   };
 
   const theme = isDarkMode ? darkTheme : lightTheme;
+
+  const muiTheme = createTheme({
+    palette: {
+      mode: isDarkMode ? "dark" : "light",
+      background: {
+        default: theme.primary,
+        paper: theme.secondary
+      },
+      text: {
+        primary: theme.tertiary
+      }
+    }
+  })
   
   useEffect(() => {
     if (!isDarkMode)
@@ -43,10 +57,12 @@ export const ThemeContextProvider = ({children}: ThemeContextProviderProps) => {
 
   return (
     <ThemeContext.Provider value={{isDarkMode, toggleTheme}}>
-      <ThemeProvider theme={theme}>
-        <GlobalStyles/>
-        { children }
-      </ThemeProvider>
+      <StyledThemeProvider theme={theme}>
+        <MuiThemeProvider theme={muiTheme}>
+            <GlobalStyles/>
+            { children }
+        </MuiThemeProvider>
+      </StyledThemeProvider>
     </ThemeContext.Provider>
   )
 }

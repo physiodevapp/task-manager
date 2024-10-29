@@ -2,11 +2,9 @@ import styled from "styled-components";
 import { ActionButton } from "../ActionButton.styled";
 
 export const Column = styled.section`
-  // flex: 1;
-  // overflow-y: auto;
-  // position: relative;
-  min-height: calc(100% - 20px);
-  padding-right: 0.8em;
+  position: relative;
+  min-height: calc(100% + 2px);
+  padding: 0em 1.14em 0em 0.4em;
 
   article {
     margin: 0em 0em 1em;

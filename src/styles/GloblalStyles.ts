@@ -5,7 +5,7 @@ export const GlobalStyles = createGlobalStyle`
     background: ${({theme}) => theme.primary};
     color: ${({theme}) => theme.tertiary};
     font-family: 'Poppins', sans-serif;
-    transition: all 0.2s ease-in-out;
+    transition: all 0s ease-in-out;
   }
 `
 
