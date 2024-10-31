@@ -21,7 +21,12 @@ const initialState: InitialState = {
 export const boardListSlice = createSlice({
   name: "boardList",
   initialState,
-  reducers: {},
+  reducers: {
+    setActiveBoardItem: (state, action: PayloadAction<BoardInterface>) => {
+      if (action.payload)
+        state.boardItem = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(boardListReadAllThunk.pending, (state) => {
@@ -55,6 +60,8 @@ export const boardListSlice = createSlice({
       })
   },
 });
+
+export const { setActiveBoardItem } = boardListSlice.actions;
 
 export const boardListErrorSelect = (state: RootState) => state.boardList.error;
 export const boardListStatusSelect = (state: RootState) => state.boardList.status;

@@ -9,6 +9,10 @@ export const Container = styled.article`
   background-color: ${({theme}) => theme.primary};
   border-radius: 1rem;
   padding: 1em;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 export const Image = styled.img`

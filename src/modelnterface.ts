@@ -7,7 +7,7 @@ export interface BoardInterface {
 }
 
 export interface TaskInterface {
-  id: number,
+  id: string,
   title: string,
   description: string,
   boardId: number,

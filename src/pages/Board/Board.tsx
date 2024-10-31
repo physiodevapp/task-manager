@@ -24,13 +24,15 @@ import {
   boardListStatusSelect,
   boardListBoardListSelect,
   boardListErrorSelect,
+  setActiveBoardItem,
+  boardListBoardItemSelect,
 } from "../../features/boardList/boardListSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { boardListReadAllThunk } from "../../features/boardList/boardListReadAllThunk";
 import { GridLoader, PropagateLoader } from "react-spinners";
 import { BoardInterface, TaskInterface } from '../../modelnterface';
 import {
-  taskItemUpdate,
+  updateTaskItem,
   taskListErrorSelect,
   taskListStatusSelect,
   taskListTaskListSelect,
@@ -39,7 +41,6 @@ import { taskListReadAllThunk } from "../../features/taskList/taskListReadAllThu
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk";
 import { Scrollbars } from "react-custom-scrollbars-2";
-import { TaskForm } from "../../components/TaskForm/TaskForm";
 import { useForm } from "../../context/form";
 
 interface ColumnInterface {
@@ -58,9 +59,6 @@ export const Board = () => {
   const [isLoadingTaskList, setIsLoadingTaskList] = useState(true);
   const [columnList, setColumnList] = useState<ColumnListInterface | null>(null);
   const [itemDragged, setItemDragged] = useState<TaskInterface | null>(null);
-  const [activeBoard, setActiveBoard] = useState<BoardInterface | undefined>(
-    undefined
-  );
 
   const scrollbarRefs = useRef<{ [key: string]: RefObject<Scrollbars> }>({});
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -70,6 +68,7 @@ export const Board = () => {
 
   const boardListDispatch = useAppDispatch();
   const boardListBoardList = useAppSelector(boardListBoardListSelect);
+  const boardListBoardItem = useAppSelector(boardListBoardItemSelect);
   const boardListStatus = useAppSelector(boardListStatusSelect);
   const boardListError = useAppSelector(boardListErrorSelect);
 
@@ -81,7 +80,8 @@ export const Board = () => {
   const baseBoardId = useId();
 
   const selectBoard = (board: BoardInterface) => {
-    setActiveBoard(board);
+    console.log(board);
+    boardListDispatch(setActiveBoardItem(board));
 
     taskListDispatch(taskListReadAllThunk({ boardId: board.id }));
   };
@@ -153,10 +153,12 @@ export const Board = () => {
         break;
 
       case "fulfilled":
-        const board = boardListBoardList?.find(
+        const board = boardListBoardItem || boardListBoardList?.find(
           (board) => board.default === "true"
         );
-        setActiveBoard(board);
+
+        if (!boardListBoardItem && board)
+          taskListDispatch(setActiveBoardItem(board));
 
         if (board)
           taskListDispatch(taskListReadAllThunk({ boardId: board.id }));
@@ -231,7 +233,7 @@ export const Board = () => {
 
   useEffect(() => {
     if (itemDragged)
-      taskListDispatch(taskItemUpdate(itemDragged));
+      taskListDispatch(updateTaskItem(itemDragged));
 
   }, [itemDragged]);
 
@@ -281,7 +283,7 @@ export const Board = () => {
                   key={`${index}-${baseBoardId}`}
                   onClick={() => selectBoard(boardItem)}
                   disabled={isLoadingTaskList}
-                  $active={boardItem.id === activeBoard?.id}
+                  $active={boardItem.id === boardListBoardItem?.id}
                 >
                   {boardItem.title}
                 </BoardItem>
@@ -351,8 +353,6 @@ export const Board = () => {
                 </BoardArea>
               }
             </DragDropContext>
-
-            {/* <TaskForm /> */}
           </>
         )}
       </MainArea>
