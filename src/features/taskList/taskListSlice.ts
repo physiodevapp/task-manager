@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TaskInterface } from "../../modelnterface";
+import { TaskInterface } from '../../modelnterface';
 import { taskListReadAllThunk } from "./taskListReadAllThunk";
 import { taskListReadOneThunk } from "./taskListReadOneThunk";
 import { RootState } from "../../app/store"
@@ -25,7 +25,7 @@ export const taskListSlice = createSlice({
   name: "taskList",
   initialState,
   reducers: {
-    taskItemUpdate: (state, action: PayloadAction<TaskInterface>) => {
+    updateTaskItem: (state, action: PayloadAction<TaskInterface>) => {
       const taskIndex = state.taskList?.findIndex((task) => task.id === action.payload.id);
 
       if (taskIndex && taskIndex !== -1 && state.taskList) {
@@ -33,6 +33,10 @@ export const taskListSlice = createSlice({
 
         state.taskItem = null;
       }
+    },
+
+    setActiveTaskItem: (state, action: PayloadAction<TaskInterface | null>) => {
+      state.taskItem = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -118,7 +122,7 @@ export const taskListSlice = createSlice({
         if (updatedItemIndex && action.payload)
           state.taskList?.splice(updatedItemIndex, 1, action.payload);
 
-        state.taskItem = action.payload;
+        state.taskItem = null;
       })
       .addCase(taskListUpdateThunk.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.status = "rejected";
@@ -128,7 +132,7 @@ export const taskListSlice = createSlice({
   },
 });
 
-export const { taskItemUpdate } = taskListSlice.actions
+export const { updateTaskItem, setActiveTaskItem } = taskListSlice.actions
 
 export const taskListStatusSelect = (state: RootState) => state.taskList.status;
 export const taskListErrorSelect = (state: RootState) => state.taskList.error;

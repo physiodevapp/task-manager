@@ -61,7 +61,7 @@ export const BoardColumn = ({
                 draggableProps={provided.draggableProps}
                 dragHandleProps={provided.dragHandleProps}
                 snapshot={snapshot}
-                description={task.description}
+                task={task}
               />
             )}
           </Draggable>
