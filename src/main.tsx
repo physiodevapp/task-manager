@@ -7,6 +7,7 @@ import { store } from './app/store';
 import { Board } from './pages/Board/Board';
 import { TaskForm } from './components/TaskForm/TaskForm';
 import { FormProvider } from './context/form';
+import { BoardForm } from './components/BoardForm/BoardForm';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
       <ThemeContextProvider>
         <FormProvider>
           <Board/>
+          <BoardForm />
           <TaskForm />
         </FormProvider>
       </ThemeContextProvider>
