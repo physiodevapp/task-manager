@@ -17,7 +17,7 @@ export const Task = forwardRef<HTMLDivElement, TaskComponentInterface>(
   ({ task, draggableProps, dragHandleProps, snapshot }, ref) => {
     const { openForm } = useForm();
 
-    const taskListDispatch = useAppDispatch();    
+    const taskListDispatch = useAppDispatch();   
 
     const handleClick = () => {
       taskListDispatch(setActiveTaskItem(task));
@@ -42,7 +42,9 @@ export const Task = forwardRef<HTMLDivElement, TaskComponentInterface>(
           alt=""
         />
         <p>{task.title}</p>
-        <TagButton>Frontend</TagButton>
+        { task.tags?.map((tag) => (
+          <TagButton>{tag}</TagButton>
+        )) }
       </Container>
     );
   }

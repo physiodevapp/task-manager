@@ -16,6 +16,7 @@ import { boardListBoardItemSelect } from "../../features/boardList/boardListSlic
 import { v4 as uuidv4 } from 'uuid';
 import { TaskInterface } from '../../modelnterface';
 import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk";
+import mockTagList from "../../data/mock_tagList.json";
 
 export const TaskForm = () => {
   const { type, closeForm } = useFormContext();
@@ -45,10 +46,7 @@ export const TaskForm = () => {
       status: taskListTaskItem?.status
         ? statusOptions.find((option) => option.value === taskListTaskItem.status)
         : { value: "backlog", label: "Backlog" },
-      tags: [
-        { value: "Concept", label: "Concept" },
-        { value: "Technical", label: "Technical" },
-      ],
+      tags: taskListTaskItem ? taskListTaskItem.tags?.map((tag) => ({ value: tag, label: tag })) : null,
     },
   });
 
@@ -73,7 +71,7 @@ export const TaskForm = () => {
         boardId: boardListBoardItem!.id,
         status: status.value,
       }
-
+      
       taskListDispatch(taskListUpdateThunk({item: task}));
     }
 
@@ -94,19 +92,13 @@ export const TaskForm = () => {
         status: taskListTaskItem?.status
         ? statusOptions.find((option) => option.value === taskListTaskItem.status)
         : { value: "backlog", label: "Backlog" },
-        tags: [
-          { value: "Concept", label: "Concept" },
-          { value: "Technical", label: "Technical" },
-        ],
+        tags: taskListTaskItem ? taskListTaskItem.tags?.map((tag) => ({ value: tag, label: tag })) : null,
       });
     else 
       reset({
         taskName: "",
         status: { value: "backlog", label: "Backlog" },
-        tags: [
-          { value: "Concept", label: "Concept" },
-          { value: "Technical", label: "Technical" },
-        ],
+        tags: null,
       });
 
     setHasStatusesValue(!!getValues("status"));
@@ -340,6 +332,7 @@ export const TaskForm = () => {
                       }),
                       multiValue: (base) => ({
                         ...base,
+                        textTransform: "capitalize",
                         backgroundColor: theme.palette.action.selected,
                         padding: theme.spacing(0.8),
                       }),
@@ -357,6 +350,7 @@ export const TaskForm = () => {
                       }),
                       option: (base, state) => ({
                         ...base,
+                        textTransform: "capitalize",
                         backgroundColor: state.isSelected
                           ? theme.palette.primary.light // Color para los elementos seleccionados
                           : state.isFocused
@@ -383,12 +377,7 @@ export const TaskForm = () => {
                     menuPlacement="auto"
                     placeholder=""
                     isMulti
-                    options={[
-                      { value: "Concept", label: "Concept" },
-                      { value: "Technical", label: "Technical" },
-                      { value: "Urgent", label: "Urgent" },
-                      { value: "Review", label: "Review" },
-                    ]}
+                    options={mockTagList.map((tag) => ({ value: tag.Title, label: tag.Title }))}
                     classNamePrefix="select"
                     onFocus={() => setIsTagsFocused(true)}
                     onBlur={() => setIsTagsFocused(false)}

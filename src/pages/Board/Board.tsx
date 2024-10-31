@@ -80,7 +80,6 @@ export const Board = () => {
   const baseBoardId = useId();
 
   const selectBoard = (board: BoardInterface) => {
-    console.log(board);
     boardListDispatch(setActiveBoardItem(board));
 
     taskListDispatch(taskListReadAllThunk({ boardId: board.id }));
@@ -110,7 +109,6 @@ export const Board = () => {
 
     if (sourceColumn === destinationColumn) {
       sourceTaskList.splice(destination.index, 0, updatedMovedTask);
-
       setColumnList({
         ...columnList,
         [source.droppableId]: {

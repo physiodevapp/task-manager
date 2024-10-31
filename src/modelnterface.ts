@@ -12,4 +12,5 @@ export interface TaskInterface {
   description: string,
   boardId: number,
   status: string,
+  tags?: string[],
 }
