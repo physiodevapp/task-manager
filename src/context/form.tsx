@@ -1,11 +1,11 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface FormStateInterface {
-  type: "task" | "board" | null;
+  type: "task" | "new-board" | "edit-board" | null;
 }
 
 interface FormContextInterface extends FormStateInterface {
-  openForm: (type: "task" | "board") => void;
+  openForm: (type: "task" | "new-board" | "edit-board") => void;
   closeForm: () => void;
 }
 
@@ -28,7 +28,7 @@ export const FormProvider = ({ children }: FormProviderPropsInterface) => {
     type: null,
   });
 
-  const openForm = (type: "task" | "board") => {
+  const openForm = (type: "task" | "new-board" | "edit-board") => {
     setFormState({
       type,
     });

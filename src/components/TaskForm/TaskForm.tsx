@@ -165,7 +165,6 @@ export const TaskForm = () => {
               render={({ field }) => (
                 <TextField
                   {...field}
-                  autoFocus
                   margin="dense"
                   label="Task name"
                   type="text"

@@ -54,7 +54,8 @@ interface ColumnListInterface {
 }
 
 export const Board = () => {
-  const { type: formType } = useForm()
+  const { type: formType, openForm } = useForm();
+  
   const [isLoadingBoardList, setIsLoadingBoardList] = useState(true);
   const [isLoadingTaskList, setIsLoadingTaskList] = useState(true);
   const [columnList, setColumnList] = useState<ColumnListInterface | null>(null);
@@ -62,6 +63,7 @@ export const Board = () => {
 
   const scrollbarRefs = useRef<{ [key: string]: RefObject<Scrollbars> }>({});
   const boardRef = useRef<HTMLDivElement | null>(null);
+  const boardListRef = useRef<HTMLUListElement | null>(null);
 
   const { isDarkMode, toggleTheme } = useCustomTheme();
   const styledTheme = useStyledTheme();
@@ -245,10 +247,17 @@ export const Board = () => {
 
   useEffect(() => {
     if (boardRef.current) {
-      if (formType)
+      if (formType === "task")
         boardRef.current.setAttribute('inert', '');
       else 
         boardRef.current.removeAttribute('inert');
+    }
+
+    if (boardListRef.current) {
+      if (formType !== null && ["new-board", "edit-board"].includes(formType))
+        boardListRef.current.setAttribute('inert', '');
+      else 
+        boardListRef.current.removeAttribute('inert');
     }
 
   }, [formType])
@@ -275,7 +284,7 @@ export const Board = () => {
               data-testid="loader"
             />
           ) : (
-            <BoardList>
+            <BoardList ref={boardListRef}>
               {boardListBoardList?.map((boardItem, index) => (
                 <BoardItem
                   key={`${index}-${baseBoardId}`}
@@ -286,7 +295,7 @@ export const Board = () => {
                   {boardItem.title}
                 </BoardItem>
               ))}
-              <AddBoard disabled={isLoadingTaskList}>
+              <AddBoard disabled={isLoadingTaskList} onClick={() => openForm("new-board")}>
                 <IoIosAddCircle /> New board
               </AddBoard>
             </BoardList>

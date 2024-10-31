@@ -4,6 +4,7 @@ export interface BoardInterface {
   default: string,
   title: string,
   author: string,
+  icon?: string,
 }
 
 export interface TaskInterface {
