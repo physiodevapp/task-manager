@@ -6,17 +6,22 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useForm as useFormContext } from "../../context/form";
-import { setActiveTaskItem, taskListTaskItemSelect } from "../../features/taskList/taskListSlice";
+import {
+  setActiveTaskItem,
+  taskListTaskItemSelect,
+} from "../../features/taskList/taskListSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Controller, useForm } from "react-hook-form";
 import Select, { components as defaultComponents } from "react-select";
-import { FormControl, FormLabel, useTheme } from "@mui/material";
+import { FormControl, FormLabel, IconButton, useTheme } from "@mui/material";
 import { taskListCreateThunk } from "../../features/taskList/taskListCreateThunk";
 import { boardListBoardItemSelect } from "../../features/boardList/boardListSlice";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { TaskInterface } from '../../modelnterface';
 import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk";
 import mockTagList from "../../data/mock_tagList.json";
+import CloseIcon from "@mui/icons-material/Close";
+import { taskListDeleteThunk } from "../../features/taskList/taskListDeleteThunk";
 
 export const TaskForm = () => {
   const { type, closeForm } = useFormContext();
@@ -44,13 +49,17 @@ export const TaskForm = () => {
     defaultValues: {
       taskName: taskListTaskItem?.title || "",
       status: taskListTaskItem?.status
-        ? statusOptions.find((option) => option.value === taskListTaskItem.status)
+        ? statusOptions.find(
+            (option) => option.value === taskListTaskItem.status
+          )
         : { value: "backlog", label: "Backlog" },
-      tags: taskListTaskItem ? taskListTaskItem.tags?.map((tag) => ({ value: tag, label: tag })) : null,
+      tags: taskListTaskItem
+        ? taskListTaskItem.tags?.map((tag) => ({ value: tag, label: tag }))
+        : null,
     },
   });
 
-  const onSubmit = ({taskName, status}: any) => {
+  const onSubmit = ({ taskName, status }: any) => {
     let task;
 
     if (!taskListTaskItem) {
@@ -60,9 +69,9 @@ export const TaskForm = () => {
         description: "",
         boardId: boardListBoardItem!.id,
         status: status.value,
-      }
+      };
 
-      taskListDispatch(taskListCreateThunk({item: task}));
+      taskListDispatch(taskListCreateThunk({ item: task }));
     } else {
       task = {
         id: taskListTaskItem.id,
@@ -70,11 +79,10 @@ export const TaskForm = () => {
         description: "",
         boardId: boardListBoardItem!.id,
         status: status.value,
-      }
-      
-      taskListDispatch(taskListUpdateThunk({item: task}));
-    }
+      };
 
+      taskListDispatch(taskListUpdateThunk({ item: task }));
+    }
 
     closeForm();
   };
@@ -85,16 +93,25 @@ export const TaskForm = () => {
     closeForm();
   };
 
+  const handleDelete = () => {
+    if (taskListTaskItem)
+      taskListDispatch(taskListDeleteThunk({item: taskListTaskItem}));
+  }
+
   useEffect(() => {
     if (taskListTaskItem)
       reset({
         taskName: taskListTaskItem.title,
         status: taskListTaskItem?.status
-        ? statusOptions.find((option) => option.value === taskListTaskItem.status)
-        : { value: "backlog", label: "Backlog" },
-        tags: taskListTaskItem ? taskListTaskItem.tags?.map((tag) => ({ value: tag, label: tag })) : null,
+          ? statusOptions.find(
+              (option) => option.value === taskListTaskItem.status
+            )
+          : { value: "backlog", label: "Backlog" },
+        tags: taskListTaskItem
+          ? taskListTaskItem.tags?.map((tag) => ({ value: tag, label: tag }))
+          : null,
       });
-    else 
+    else
       reset({
         taskName: "",
         status: { value: "backlog", label: "Backlog" },
@@ -115,6 +132,17 @@ export const TaskForm = () => {
       >
         <DialogTitle>
           {taskListTaskItem ? "Task details" : "Add a new task"}
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+              position: "absolute",
+              right: theme.spacing(1),
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
@@ -144,7 +172,7 @@ export const TaskForm = () => {
                   fullWidth
                   variant="outlined"
                   sx={{
-                    marginBottom: 0
+                    marginBottom: 0,
                   }}
                 />
               )}
@@ -188,14 +216,18 @@ export const TaskForm = () => {
                 render={({ field }) => (
                   <Select
                     {...field}
-                    value={statusOptions.find((option) => option.value === field.value?.value) || null}
+                    value={
+                      statusOptions.find(
+                        (option) => option.value === field.value?.value
+                      ) || null
+                    }
                     inputId="statuses-select"
                     styles={{
                       control: (base) => ({
                         ...base,
                         boxSizing: "border-box",
                         backgroundColor: "inherit",
-                        marginTop: theme.spacing(2),  
+                        marginTop: theme.spacing(2),
                         padding: theme.spacing(0),
                         height: "3.5em",
                         "&:hover:not(:focus-within)": {
@@ -219,7 +251,7 @@ export const TaskForm = () => {
                       }),
                       singleValue: (base) => ({
                         ...base,
-                        color: theme.palette.text.primary
+                        color: theme.palette.text.primary,
                       }),
                       option: (base, state) => ({
                         ...base,
@@ -250,7 +282,14 @@ export const TaskForm = () => {
                     placeholder=""
                     isClearable={true}
                     isDisabled={!taskListTaskItem}
-                    components={{ DropdownIndicator: !taskListTaskItem ? () => null : defaultComponents.DropdownIndicator, IndicatorSeparator: !taskListTaskItem ? () => null : defaultComponents.IndicatorSeparator }}
+                    components={{
+                      DropdownIndicator: !taskListTaskItem
+                        ? () => null
+                        : defaultComponents.DropdownIndicator,
+                      IndicatorSeparator: !taskListTaskItem
+                        ? () => null
+                        : defaultComponents.IndicatorSeparator,
+                    }}
                     options={statusOptions}
                     classNamePrefix="select"
                     onFocus={() => setIsStatusesFocused(true)}
@@ -377,7 +416,10 @@ export const TaskForm = () => {
                     menuPlacement="auto"
                     placeholder=""
                     isMulti
-                    options={mockTagList.map((tag) => ({ value: tag.Title, label: tag.Title }))}
+                    options={mockTagList.map((tag) => ({
+                      value: tag.Title,
+                      label: tag.Title,
+                    }))}
                     classNamePrefix="select"
                     onFocus={() => setIsTagsFocused(true)}
                     onBlur={() => setIsTagsFocused(false)}
@@ -390,11 +432,26 @@ export const TaskForm = () => {
               />
             </FormControl>
           </DialogContent>
-          <DialogActions>
+          <DialogActions
+            sx={{ padding: theme.spacing(3), paddingTop: theme.spacing(2) }}
+          >
             <Button onClick={handleClose}>Cancel</Button>
             <Button type="submit" variant="contained" color="primary">
               {taskListTaskItem ? "Save" : "Add"}
             </Button>
+            {taskListTaskItem ? (
+              <Button
+                type="submit"
+                variant="contained"
+                color="error"
+                sx={{ position: "absolute", left: theme.spacing(2) }}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+            ) : (
+              <></>
+            )}
           </DialogActions>
         </form>
       </Dialog>
