@@ -3,6 +3,7 @@ import { boardListReadAllThunk } from "./boardListReadAllThunk";
 import { RootState } from "../../app/store";
 import { BoardInterface } from '../../modelnterface';
 import { boardListCreateThunk } from "./boardListCreate";
+import { boardListDeleteThunk } from "./boardListDeleteThunk";
 
 interface InitialState {
   error: string | null,
@@ -58,6 +59,24 @@ export const boardListSlice = createSlice({
 
         state.error = action.payload || "An error ocurred";
       })
+      .addCase(boardListDeleteThunk.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(boardListDeleteThunk.fulfilled, (state, action: PayloadAction<BoardInterface | null>) => {
+        state.status = "fulfilled";
+
+        if (state.boardList && action.payload)
+            state.boardList = state.boardList.filter((item) => item.id !== action.payload?.id);
+
+        if (action.payload?.id === state.boardItem?.id)
+          state.boardItem = null;
+      })
+      .addCase(boardListDeleteThunk.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.status = "rejected";
+
+        state.error = action.payload || "An error ocurred";
+      })
+
   },
 });
 
