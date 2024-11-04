@@ -13,13 +13,23 @@ import {
   ColumnTitlesContainer,
   Title,
   BoardArea,
+  BoardTitle,
+  BoardDeleteIcon,
 } from "./Board.styled";
 import { BoardColumn } from "../../components/BoardColumn/BoardColumn";
 import { CiDark, CiLight } from "react-icons/ci";
 import { IoIosAddCircle } from "react-icons/io";
+import { FaRegTrashCan } from "react-icons/fa6";
 import { useTheme as useCustomTheme } from "../../context/theme";
 import { useTheme as useStyledTheme } from "styled-components";
-import { createRef, RefObject, useEffect, useId, useRef, useState } from "react";
+import {
+  createRef,
+  RefObject,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import {
   boardListStatusSelect,
   boardListBoardListSelect,
@@ -30,7 +40,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { boardListReadAllThunk } from "../../features/boardList/boardListReadAllThunk";
 import { GridLoader, PropagateLoader } from "react-spinners";
-import { BoardInterface, TaskInterface } from '../../modelnterface';
+import { BoardInterface, TaskInterface } from "../../modelnterface";
 import {
   updateTaskItem,
   taskListErrorSelect,
@@ -38,27 +48,30 @@ import {
   taskListTaskListSelect,
 } from "../../features/taskList/taskListSlice";
 import { taskListReadAllThunk } from "../../features/taskList/taskListReadAllThunk";
-import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { useForm } from "../../context/form";
+import { boardListDeleteThunk } from "../../features/boardList/boardListDeleteThunk";
 
 interface ColumnInterface {
-  id: string,
-  title: string,
-  tasks: TaskInterface[],
+  id: string;
+  title: string;
+  tasks: TaskInterface[];
 }
 
 interface ColumnListInterface {
-  [key: string]: ColumnInterface
+  [key: string]: ColumnInterface;
 }
 
 export const Board = () => {
   const { type: formType, openForm } = useForm();
-  
+
   const [isLoadingBoardList, setIsLoadingBoardList] = useState(true);
   const [isLoadingTaskList, setIsLoadingTaskList] = useState(true);
-  const [columnList, setColumnList] = useState<ColumnListInterface | null>(null);
+  const [columnList, setColumnList] = useState<ColumnListInterface | null>(
+    null
+  );
   const [itemDragged, setItemDragged] = useState<TaskInterface | null>(null);
 
   const scrollbarRefs = useRef<{ [key: string]: RefObject<Scrollbars> }>({});
@@ -89,12 +102,14 @@ export const Board = () => {
 
   const handleDragEnd = (result: any) => {
     const { source, destination } = result;
-    
-    if (!destination)
-      return
 
-    if (source.droppableId === destination.droppableId && source.index === destination.index)
-      return
+    if (!destination) return;
+
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    )
+      return;
 
     const sourceColumn = columnList![source.droppableId];
     const destinationColumn = columnList![destination.droppableId];
@@ -116,7 +131,7 @@ export const Board = () => {
         [source.droppableId]: {
           ...sourceColumn,
           tasks: sourceTaskList,
-        }
+        },
       });
     } else {
       destinationTaskList.splice(destination.index, 0, updatedMovedTask);
@@ -130,12 +145,19 @@ export const Board = () => {
         [destination.droppableId]: {
           ...destinationColumn,
           tasks: destinationTaskList,
-        }
-      })
+        },
+      });
     }
 
-    setItemDragged(updatedMovedTask);    
-  }
+    setItemDragged(updatedMovedTask);
+  };
+
+  const handleDeleteBoard = (event: any, board: BoardInterface) => {
+    event.stopPropagation();
+
+    if (board)
+      boardListDispatch(boardListDeleteThunk({ item: board }));
+  };
 
   useEffect(() => {
     boardListDispatch(boardListReadAllThunk());
@@ -153,15 +175,19 @@ export const Board = () => {
         break;
 
       case "fulfilled":
-        const board = boardListBoardItem || boardListBoardList?.find(
-          (board) => board.default === "true"
-        );
+        const board =
+          boardListBoardItem ||
+          boardListBoardList?.find((board) => board.default === "true");
 
         if (!boardListBoardItem && board)
           taskListDispatch(setActiveBoardItem(board));
 
-        if (board)
-          taskListDispatch(taskListReadAllThunk({ boardId: board.id }));
+        if (true)
+          taskListDispatch(taskListReadAllThunk({ boardId: board?.id }));
+
+        // console.log(!boardListBoardItem && board);
+        // if (!board)
+        // setIsLoadingTaskList(false);
 
         setIsLoadingBoardList(false);
         break;
@@ -187,37 +213,39 @@ export const Board = () => {
         break;
 
       case "fulfilled":
-        setColumnList({
-          ['column-1']: {
-            id: 'column-1',
-            title: 'Backlog',
-            tasks: taskListTaskList!.filter(
-              (task) => task.status === "backlog"
-            ),
-          },
-          ['column-2']: {
-            id: 'column-2',
-            title: 'In progress',
-            tasks: taskListTaskList!.filter(
-              (task) => task.status === "in_progress"
-            ),
-          },
-          ['column-3']: {
-            id: 'column-3',
-            title: 'In review',
-            tasks: taskListTaskList!.filter(
-              (task) => task.status === "in_review"
-            ),
-          },
-          ['column-4']: {
-            id: 'column-4',
-            title: 'Completed',
-            tasks: taskListTaskList!.filter(
-              (task) => task.status === "completed"
-            ),
-          },
-        });
-        
+        if (boardListBoardItem)
+          setColumnList({
+            ["column-1"]: {
+              id: "column-1",
+              title: "Backlog",
+              tasks: taskListTaskList!.filter(
+                (task) => task.status === "backlog"
+              ),
+            },
+            ["column-2"]: {
+              id: "column-2",
+              title: "In progress",
+              tasks: taskListTaskList!.filter(
+                (task) => task.status === "in_progress"
+              ),
+            },
+            ["column-3"]: {
+              id: "column-3",
+              title: "In review",
+              tasks: taskListTaskList!.filter(
+                (task) => task.status === "in_review"
+              ),
+            },
+            ["column-4"]: {
+              id: "column-4",
+              title: "Completed",
+              tasks: taskListTaskList!.filter(
+                (task) => task.status === "completed"
+              ),
+            },
+          });
+        else setColumnList(null);
+
         setIsLoadingTaskList(false);
         break;
 
@@ -232,9 +260,7 @@ export const Board = () => {
   }, [taskListStatus]);
 
   useEffect(() => {
-    if (itemDragged)
-      taskListDispatch(updateTaskItem(itemDragged));
-
+    if (itemDragged) taskListDispatch(updateTaskItem(itemDragged));
   }, [itemDragged]);
 
   useEffect(() => {
@@ -247,20 +273,16 @@ export const Board = () => {
 
   useEffect(() => {
     if (boardRef.current) {
-      if (formType === "task")
-        boardRef.current.setAttribute('inert', '');
-      else 
-        boardRef.current.removeAttribute('inert');
+      if (formType === "task") boardRef.current.setAttribute("inert", "");
+      else boardRef.current.removeAttribute("inert");
     }
 
     if (boardListRef.current) {
       if (formType !== null && ["new-board", "edit-board"].includes(formType))
-        boardListRef.current.setAttribute('inert', '');
-      else 
-        boardListRef.current.removeAttribute('inert');
+        boardListRef.current.setAttribute("inert", "");
+      else boardListRef.current.removeAttribute("inert");
     }
-
-  }, [formType])
+  }, [formType]);
 
   return (
     <Grid>
@@ -292,10 +314,18 @@ export const Board = () => {
                   disabled={isLoadingTaskList}
                   $active={boardItem.id === boardListBoardItem?.id}
                 >
-                  {boardItem.title}
+                  {/* <>
+                    {boardItem.title}
+                    <FaRegTrashCan />
+                  </> */}
+                  <BoardTitle>{boardItem.title}</BoardTitle>
+                  <BoardDeleteIcon onClick={(event) => handleDeleteBoard(event, boardItem)} />
                 </BoardItem>
               ))}
-              <AddBoard disabled={isLoadingTaskList} onClick={() => openForm("new-board")}>
+              <AddBoard
+                disabled={isLoadingTaskList}
+                onClick={() => openForm("new-board")}
+              >
                 <IoIosAddCircle /> New board
               </AddBoard>
             </BoardList>
@@ -314,7 +344,7 @@ export const Board = () => {
         </ThemeContainer>
       </SideArea>
       <MainArea>
-        {(isLoadingBoardList || isLoadingTaskList || !columnList) ? (
+        {isLoadingBoardList || isLoadingTaskList || !columnList ? (
           <PropagateLoader
             color={styledTheme.tertiary}
             loading={isLoadingTaskList}
@@ -330,33 +360,35 @@ export const Board = () => {
             data-testid="loader"
           />
         ) : (
-          <>   
+          <>
             <ColumnTitlesContainer>
-              {
-                Object.entries(columnList).map(([columnId, columnItem]) => (
-                  <Title key={columnId} $columnId={columnId}><span/>{ `${columnItem.title} ${columnItem.tasks.length ? `(${columnItem.tasks.length})` : ''}` }</Title>
-                ))
-              }            
-            </ColumnTitlesContainer>         
+              {Object.entries(columnList).map(([columnId, columnItem]) => (
+                <Title key={columnId} $columnId={columnId}>
+                  <span />
+                  {`${columnItem.title} ${
+                    columnItem.tasks.length
+                      ? `(${columnItem.tasks.length})`
+                      : ""
+                  }`}
+                </Title>
+              ))}
+            </ColumnTitlesContainer>
             <DragDropContext onDragEnd={handleDragEnd}>
               {
                 <BoardArea ref={boardRef}>
-                  {
-                    Object.entries(columnList).map(([columnId, columnItem]) => (
-                      <Droppable key={columnId} droppableId={columnId}>
-                        {
-                          (provided) => (
-                            <BoardColumn
-                              {...provided.droppableProps}
-                              provided={provided}
-                              showAddButton={columnId === "column-1"}
-                              tasks={columnItem.tasks}
-                              scrollbarRef={scrollbarRefs.current[columnId]}/>
-                          )
-                        }
-                      </Droppable>                      
-                    ))
-                  }
+                  {Object.entries(columnList).map(([columnId, columnItem]) => (
+                    <Droppable key={columnId} droppableId={columnId}>
+                      {(provided) => (
+                        <BoardColumn
+                          {...provided.droppableProps}
+                          provided={provided}
+                          showAddButton={columnId === "column-1"}
+                          tasks={columnItem.tasks}
+                          scrollbarRef={scrollbarRefs.current[columnId]}
+                        />
+                      )}
+                    </Droppable>
+                  ))}
                 </BoardArea>
               }
             </DragDropContext>

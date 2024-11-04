@@ -1,6 +1,6 @@
 import styled, { DefaultTheme } from "styled-components";
 import { ActionButton } from "../../components/ActionButton.styled";
-
+import { FaRegTrashCan } from "react-icons/fa6";
 
 export const Grid = styled.div`
   height: 100vh;
@@ -12,7 +12,7 @@ export const Grid = styled.div`
   overflow: hidden;
   gap: 1em;
   transition: grid-template-columns 0.4s ease-in-out;
-`
+`;
 
 export const SideArea = styled.aside`
   height: 100%;
@@ -21,19 +21,19 @@ export const SideArea = styled.aside`
   align-content: space-between;
   flex-wrap: wrap;
   border-radius: 1rem;
-  background-color: ${({theme}) => theme.primary};
+  background-color: ${({ theme }) => theme.primary};
   position: relative;
-`
+`;
 
 export const MainArea = styled.main`
-  background-color: ${({theme}) => theme.secondary};
+  background-color: ${({ theme }) => theme.secondary};
   border-radius: 1rem;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-`
+`;
 
 export const BoardArea = styled.section`
   display: flex;
@@ -42,14 +42,14 @@ export const BoardArea = styled.section`
   overflow: hidden;
   height: 100%;
   flex: 1;
-`
+`;
 interface ThemeContainerInterface {
-  $isDarkMode: boolean
+  $isDarkMode: boolean;
 }
 
 export const ThemeContainer = styled.div<ThemeContainerInterface>`
   width: 100%;
-  background-color: ${({theme}) => theme.secondary};
+  background-color: ${({ theme }) => theme.secondary};
   padding: 0.8em;
   border-radius: 1em;
   position: relative;
@@ -58,25 +58,27 @@ export const ThemeContainer = styled.div<ThemeContainerInterface>`
 
   > button:first-of-type {
     &:hover {
-      background-color: ${({theme, $isDarkMode}) => $isDarkMode ? 'transparent' : theme.primary};
-    } 
+      background-color: ${({ theme, $isDarkMode }) =>
+        $isDarkMode ? "transparent" : theme.primary};
+    }
   }
 
   > button:last-of-type {
     &:hover {
-      background-color: ${({theme, $isDarkMode}) => !$isDarkMode ? 'transparent' : theme.primary};
-    } 
+      background-color: ${({ theme, $isDarkMode }) =>
+        !$isDarkMode ? "transparent" : theme.primary};
+    }
   }
-`
+`;
 
-export const ThemeButton = styled(ActionButton)`  
+export const ThemeButton = styled(ActionButton)`
   width: 50%;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   font-size: 1.2em;
   background-color: transparent;
-  color: ${({theme}) => theme.tertiary};
+  color: ${({ theme }) => theme.tertiary};
   border-radius: 0.6em;
 
   &:hover {
@@ -87,7 +89,7 @@ export const ThemeButton = styled(ActionButton)`
     font-size: 1.4em;
     margin-right: 0.2em;
   }
-`
+`;
 
 interface CurrentThemeMarkerInterface {
   $isDarkMode: boolean;
@@ -97,26 +99,27 @@ export const CurrentThemeMarker = styled.span<CurrentThemeMarkerInterface>`
   position: absolute;
   top: 50%;
   left: 0.7em;
-  transform: ${({$isDarkMode}) => `translate(${$isDarkMode ? 0 : 105}%, -50%)`};
+  transform: ${({ $isDarkMode }) =>
+    `translate(${$isDarkMode ? 0 : 105}%, -50%)`};
   padding: 1.6em;
   border-radius: 0.8em;
-  border: ${({theme}) => `2px solid ${theme.tertiary}`};
+  border: ${({ theme }) => `2px solid ${theme.tertiary}`};
   background-color: transparent;
   width: calc(50% - 0.9em);
   transition: all 0.4s ease-out;
-  opacity: ${({$isDarkMode}) => $isDarkMode ? 1 : 0.2}
-`
+  opacity: ${({ $isDarkMode }) => ($isDarkMode ? 1 : 0.2)};
+`;
 
 export const BoardListContainer = styled.div`
   width: 100%;
-`
+`;
 
 export const BoardListTitle = styled.h4`
   margin: 0.4em 0em 1.4em;
   font-size: 2em;
   font-weight: bold;
   text-align: center;
-`
+`;
 
 export const BoardList = styled.ul`
   width: 100%;
@@ -126,33 +129,59 @@ export const BoardList = styled.ul`
     opacity: 0.6;
     cursor: default;
   }
-`
+`;
 
 interface BoardItemInterface {
-  $active: boolean
+  $active: boolean;
 }
 
 export const BoardItem = styled(ActionButton)<BoardItemInterface>`
   width: 100%;
   margin: 0em 0em 1em;
-  background-color: ${({theme, $active}) => `${$active ? theme.secondary: 'transparent'}`};
-  color: ${({theme}) => theme.tertiary};
+  background-color: ${({ theme, $active }) =>
+    `${$active ? theme.secondary : "transparent"}`};
+  color: ${({ theme }) => theme.tertiary};
   font-size: 1.2em;
-  border: ${({theme, $active}) => `2px ${$active ? 'solid' : 'dotted'} ${theme.tertiary}`};
+  border: ${({ theme, $active }) =>
+    `2px ${$active ? "solid" : "dotted"} ${theme.tertiary}`};
   border-radius: 2em;
-
+  position: relative;
 
   &:not(:disabled):hover {
     border-style: solid;
     cursor: pointer;
     font-weight: bold;
+
+    span {
+      transform: translateX(-50px);
+    }
+
+    svg {
+      opacity: 1;
+      transform: translateX(-20px);
+    }
   }
-`
+`;
+
+export const BoardTitle = styled.span`
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+`;
+
+export const BoardDeleteIcon = styled(FaRegTrashCan)`
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateX(0px);
+  margin-left: 8px;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+`;
 
 export const AddBoard = styled(ActionButton)`
   width: 100%;
   background-color: transparent;
-  color: ${({theme}) => theme.tertiary};
+  color: ${({ theme }) => theme.tertiary};
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -165,9 +194,9 @@ export const AddBoard = styled(ActionButton)`
 
   &:not(:disabled):hover {
     cursor: pointer;
-    background-color: ${({theme}) => theme.secondary}
+    background-color: ${({ theme }) => theme.secondary};
   }
-`
+`;
 
 export const ColumnTitlesContainer = styled.ul`
   position: absolute;
@@ -177,26 +206,26 @@ export const ColumnTitlesContainer = styled.ul`
   padding: 0em 1em;
   list-style: none;
   gap: 1em;
-`
+`;
 
 interface TitleInterface {
-  $columnId: string,
+  $columnId: string;
 }
 
 const setTitleColor = (columnId: string, theme: DefaultTheme): string => {
   switch (columnId) {
-    case 'column-1':
-      return 'red';
-    case 'column-2':
-      return 'yellow'
-    case 'column-3':
-      return '#fb3afb';
-    case 'column-4':
-      return '#1bef1b';  
+    case "column-1":
+      return "red";
+    case "column-2":
+      return "yellow";
+    case "column-3":
+      return "#fb3afb";
+    case "column-4":
+      return "#1bef1b";
     default:
       return theme.tertiary;
   }
-}
+};
 
 export const Title = styled.li<TitleInterface>`
   flex: 1;
@@ -206,8 +235,8 @@ export const Title = styled.li<TitleInterface>`
     display: inline-block;
     width: 0.6em;
     height: 0.6em;
-    background: ${({theme, $columnId}) => setTitleColor($columnId, theme)};
+    background: ${({ theme, $columnId }) => setTitleColor($columnId, theme)};
     border-radius: 1em;
     margin: 0em 0.6em 0em 0em;
   }
-`
+`;

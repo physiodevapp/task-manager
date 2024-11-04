@@ -5,6 +5,9 @@ import taskList from "../../data/mock_taskList.json";
 
 export const taskListReadAllThunk = createAsyncThunk<TaskInterface[], { boardId?: number }, { rejectValue: string }>("taskList/taskListReadAll", async( { boardId }, { rejectWithValue }) => {
   try {
+    if (!boardId)
+      return []
+    
     const list = await getList<TaskInterface>(taskList as TaskInterface[], boardId as number);
 
     return list;
