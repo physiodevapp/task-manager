@@ -1,6 +1,6 @@
 
 export interface BoardInterface {
-  id: number,
+  id: string,
   default: string,
   title: string,
   author: string,

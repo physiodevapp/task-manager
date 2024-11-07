@@ -185,10 +185,6 @@ export const Board = () => {
         if (true)
           taskListDispatch(taskListReadAllThunk({ boardId: board?.id }));
 
-        // console.log(!boardListBoardItem && board);
-        // if (!board)
-        // setIsLoadingTaskList(false);
-
         setIsLoadingBoardList(false);
         break;
 
@@ -314,10 +310,6 @@ export const Board = () => {
                   disabled={isLoadingTaskList}
                   $active={boardItem.id === boardListBoardItem?.id}
                 >
-                  {/* <>
-                    {boardItem.title}
-                    <FaRegTrashCan />
-                  </> */}
                   <BoardTitle>{boardItem.title}</BoardTitle>
                   <BoardDeleteIcon onClick={(event) => handleDeleteBoard(event, boardItem)} />
                 </BoardItem>

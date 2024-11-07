@@ -157,8 +157,8 @@ export const BoardItem = styled(ActionButton)<BoardItemInterface>`
     }
 
     svg {
-      opacity: 1;
-      transform: translateX(-20px);
+      opacity: 0.4;
+      transform: translate(-20px, -50%);
     }
   }
 `;
@@ -170,12 +170,17 @@ export const BoardTitle = styled.span`
 
 export const BoardDeleteIcon = styled(FaRegTrashCan)`
   opacity: 0;
+  top: 50%;
+  right: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
-  transform: translateX(0px);
+  transform: translate(0px, -50%);
   margin-left: 8px;
   cursor: pointer;
   position: absolute;
-  right: 0;
+
+  &:hover {
+    opacity: 1 !important;
+  }
 `;
 
 export const AddBoard = styled(ActionButton)`

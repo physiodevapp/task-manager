@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { useForm as useFormContext } from "../../context/form";
 import CloseIcon from "@mui/icons-material/Close";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { boardListBoardItemSelect } from "../../features/boardList/boardListSlice";
 import { Controller, useForm } from "react-hook-form";
 import { cloneElement, useEffect, useState } from "react";
@@ -30,6 +30,10 @@ import {
   SubwayOutlined,
   DirectionsBoatOutlined,
 } from "@mui/icons-material";
+import { boardListCreateThunk } from "../../features/boardList/boardListCreate";
+import { BoardInterface } from "../../modelnterface";
+import { v4 as uuidv4 } from "uuid";
+
 
 export const BoardForm = () => {
   const { type, closeForm } = useFormContext();
@@ -37,8 +41,14 @@ export const BoardForm = () => {
   const theme = useTheme();
 
   const boardListBoardItem = useAppSelector(boardListBoardItemSelect);
+  const boardListDispatch = useAppDispatch();
 
-  const { handleSubmit, control, reset, getValues } = useForm({
+  type FormValues = {
+    boardName: string;
+    icon: string | null;
+  };
+
+  const { handleSubmit, control, reset, getValues, setValue } = useForm<FormValues>({
     defaultValues: {
       boardName: (type === "edit-board" && boardListBoardItem?.title) || "",
       icon: null,
@@ -63,14 +73,28 @@ export const BoardForm = () => {
   };
 
   const handleClose = () => {
-    // taskListDispatch(setActiveTaskItem(null));
-
     closeForm();
   };
 
   const onSubmit = (data: any) => {
+    const newBoard: BoardInterface =  {
+      id: uuidv4(),
+      default: 'false',
+      title: data.boardName,
+      author: "Edu",
+      icon: data.icon,
+    };
+
+    boardListDispatch(boardListCreateThunk({item: newBoard}));
+
     closeForm();
   };
+
+  useEffect(() => {
+    if (selectedValue)
+      setValue("icon", selectedValue);
+
+  }, [selectedValue]);
 
   useEffect(() => {
     if (boardListBoardItem && type === "edit-board")
@@ -82,7 +106,10 @@ export const BoardForm = () => {
         boardName: "",
         icon: null,
       });
-  }, [boardListBoardItem, reset]);
+
+    setSelectedValue("");
+
+  }, [type, boardListBoardItem, reset]);
 
   return (
     <>
@@ -111,13 +138,20 @@ export const BoardForm = () => {
             <Controller
               name="boardName"
               control={control}
-              render={({ field }) => (
+              rules={{
+                required: "Board name is required",
+                minLength: { value: 8, message: "Board name must be at least 8 characters" },
+              }}
+              render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
                   margin="dense"
                   label="Board name"
                   type="text"
                   fullWidth
+                  required
+                  error={!!error}
+                  helperText={error ? error.message : ""}
                   variant="outlined"
                   sx={{
                     marginBottom: 0,
@@ -134,7 +168,12 @@ export const BoardForm = () => {
               }}
             >
               <Box sx={{ display: "flex", flexDirection: "row" }}>
-                <RadioGroup row value={selectedValue} onChange={handleChange} sx={{gap: 2}}>
+                <RadioGroup
+                  row
+                  value={selectedValue}
+                  onChange={handleChange}
+                  sx={{ gap: 2 }}
+                >
                   {radioItems.map((item) => (
                     <FormControlLabel
                       key={item.value}
@@ -193,7 +232,7 @@ export const BoardForm = () => {
             sx={{ padding: theme.spacing(3), paddingTop: theme.spacing(1) }}
           >
             <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button onClick={handleSubmit(onSubmit)} type="submit" variant="contained" color="primary">
               {type === "edit-board" ? "Save" : "Add"}
             </Button>
             {type === "edit-board" ? (
