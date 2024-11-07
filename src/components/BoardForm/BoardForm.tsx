@@ -141,6 +141,7 @@ export const BoardForm = () => {
               rules={{
                 required: "Board name is required",
                 minLength: { value: 8, message: "Board name must be at least 8 characters" },
+                maxLength: { value: 18, message: "Board name cannot exceed 18 characters" }
               }}
               render={({ field, fieldState: { error } }) => (
                 <TextField

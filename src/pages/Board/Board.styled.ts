@@ -152,11 +152,11 @@ export const BoardItem = styled(ActionButton)<BoardItemInterface>`
     cursor: pointer;
     font-weight: bold;
 
-    span {
-      transform: translateX(-50px);
-    }
-
-    svg {
+    // span {
+    //   transform: translateX(-50px);
+    // }
+    
+    .board__delete {
       opacity: 0.4;
       transform: translate(-20px, -50%);
     }
@@ -167,6 +167,16 @@ export const BoardTitle = styled.span`
   transition: transform 0.3s ease;
   white-space: nowrap;
 `;
+
+export const BoardIcon = styled.svg`
+  position: absolute;
+  left: 20px;
+  width: 1.4em;
+  height: 1.4em;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+`
 
 export const BoardDeleteIcon = styled(FaRegTrashCan)`
   opacity: 0;
