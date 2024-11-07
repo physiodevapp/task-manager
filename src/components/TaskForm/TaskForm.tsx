@@ -13,11 +13,17 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Controller, useForm } from "react-hook-form";
 import Select, { components as defaultComponents } from "react-select";
-import { FormControl, FormLabel, IconButton, useTheme } from "@mui/material";
+import {
+  FormControl,
+  FormLabel,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { taskListCreateThunk } from "../../features/taskList/taskListCreateThunk";
 import { boardListBoardItemSelect } from "../../features/boardList/boardListSlice";
 import { v4 as uuidv4 } from "uuid";
-import { TaskInterface } from '../../modelnterface';
+import { TaskInterface } from "../../modelnterface";
 import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk";
 import mockTagList from "../../data/mock_tagList.json";
 import CloseIcon from "@mui/icons-material/Close";
@@ -60,7 +66,7 @@ export const TaskForm = () => {
   });
 
   const onSubmit = ({ taskName, status }: any) => {
-    let task;
+    let task: TaskInterface;
 
     if (!taskListTaskItem) {
       task = {
@@ -95,8 +101,8 @@ export const TaskForm = () => {
 
   const handleDelete = () => {
     if (taskListTaskItem)
-      taskListDispatch(taskListDeleteThunk({item: taskListTaskItem}));
-  }
+      taskListDispatch(taskListDeleteThunk({ item: taskListTaskItem }));
+  };
 
   useEffect(() => {
     if (taskListTaskItem)
@@ -120,7 +126,7 @@ export const TaskForm = () => {
 
     setHasStatusesValue(!!getValues("status"));
     setHasTagsValue(!!getValues("tags"));
-  }, [taskListTaskItem, reset]);
+  }, [type, taskListTaskItem, reset]);
 
   return (
     <>
@@ -145,7 +151,7 @@ export const TaskForm = () => {
           </IconButton>
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent>
+          <DialogContent sx={{overflow: "hidden"}}>
             <div style={{ marginBottom: "20px", textAlign: "center" }}>
               <img
                 src={"https://via.placeholder.com/100"}
@@ -162,13 +168,16 @@ export const TaskForm = () => {
             <Controller
               name="taskName"
               control={control}
-              render={({ field }) => (
+              rules={{ required: "Task name is required" }}
+              render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
                   margin="dense"
                   label="Task name"
                   type="text"
                   fullWidth
+                  error={!!error}
+                  helperText={error ? error.message : ""}
                   variant="outlined"
                   sx={{
                     marginBottom: 0,
@@ -178,255 +187,290 @@ export const TaskForm = () => {
             />
 
             <FormControl fullWidth>
-              <FormLabel
-                htmlFor="statuses-select"
-                style={{
-                  position: "absolute",
-                  zIndex: 10,
-                  left: "12px",
-                  top: isStatusesFocused || hasStatusesValue ? "10%" : "60%",
-                  fontSize:
-                    isStatusesFocused || hasStatusesValue
-                      ? theme.typography.caption.fontSize
-                      : "1rem",
-                  borderRadius: theme.shape.borderRadius,
-                  color: isStatusesFocused
-                    ? theme.palette.primary.main
-                    : theme.palette.text.secondary,
-                  transform:
-                    isStatusesFocused || hasStatusesValue
-                      ? "translateY(0%)"
-                      : "translateY(-50%)",
-                  transition: "all 0.2s ease-in-out",
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? "#4d5054"
-                      : theme.palette.common.white,
-                  padding: "0 4px",
-                  pointerEvents: "none", // Evita que el label interfiera con el clic del Select
-                }}
-              >
-                Status
-              </FormLabel>
-
               <Controller
                 name="status"
                 control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    value={
-                      statusOptions.find(
-                        (option) => option.value === field.value?.value
-                      ) || null
-                    }
-                    inputId="statuses-select"
-                    styles={{
-                      control: (base) => ({
-                        ...base,
-                        boxSizing: "border-box",
-                        backgroundColor: "inherit",
-                        marginTop: theme.spacing(2),
-                        padding: theme.spacing(0),
-                        height: "3.5em",
-                        "&:hover:not(:focus-within)": {
-                          borderColor: theme.palette.text.primary,
-                        },
-                        "&:focus-within": {
-                          boxShadow: `inset 0 0 0 1px ${theme.palette.primary.main}`,
-                        },
-                      }),
-                      valueContainer: (base) => ({
-                        ...base,
-                        gap: "0.4em",
-                      }),
-                      menu: (base) => ({
-                        ...base,
-                        backgroundColor: theme.palette.background.paper,
-                        color: theme.palette.text.primary,
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <FormLabel
+                      htmlFor="statuses-select"
+                      style={{
+                        position: "absolute",
+                        zIndex: 10,
+                        left: "12px",
+                        top:
+                          isStatusesFocused || hasStatusesValue ? "10%" : "60%",
+                        fontSize:
+                          isStatusesFocused || hasStatusesValue
+                            ? theme.typography.caption.fontSize
+                            : "1rem",
                         borderRadius: theme.shape.borderRadius,
-                        boxShadow: theme.shadows[3],
-                        zIndex: 100,
-                      }),
-                      singleValue: (base) => ({
-                        ...base,
-                        color: theme.palette.text.primary,
-                      }),
-                      option: (base, state) => ({
-                        ...base,
-                        backgroundColor: state.isSelected
-                          ? theme.palette.primary.light // Color para los elementos seleccionados
-                          : state.isFocused
-                          ? theme.palette.action.hover // Color cuando el elemento está enfocado
-                          : "transparent",
-                        color: state.isSelected
-                          ? theme.palette.primary.contrastText // Color del texto cuando está seleccionado
-                          : theme.palette.text.primary, // Color del texto por defecto
-                        "&:active": {
-                          backgroundColor: theme.palette.primary.main, // Color de fondo cuando se hace clic
-                        },
-                      }),
-                      input: (base) => ({
-                        ...base,
-                        color: theme.palette.text.primary, // Cambia este valor para definir el color del texto
-                      }),
-                      placeholder: (base, state) => ({
-                        ...base,
-                        color: state.isFocused
-                          ? theme.palette.divider // Color del placeholder cuando está enfocado
-                          : theme.palette.grey[400], // Color del placeholder cuando no está enfocado
-                      }),
-                    }}
-                    menuPlacement="auto"
-                    placeholder=""
-                    isClearable={true}
-                    isDisabled={!taskListTaskItem}
-                    components={{
-                      DropdownIndicator: !taskListTaskItem
-                        ? () => null
-                        : defaultComponents.DropdownIndicator,
-                      IndicatorSeparator: !taskListTaskItem
-                        ? () => null
-                        : defaultComponents.IndicatorSeparator,
-                    }}
-                    options={statusOptions}
-                    classNamePrefix="select"
-                    onFocus={() => setIsStatusesFocused(true)}
-                    onBlur={() => setIsStatusesFocused(false)}
-                    onChange={(option) => {
-                      field.onChange(option ? option : null); // Extrae solo el valor seleccionado
-                      setHasStatusesValue(option != null);
-                    }}
-                  />
+                        color: isStatusesFocused
+                          ? theme.palette.primary.main
+                          : theme.palette.text.secondary,
+                        transform:
+                          isStatusesFocused || hasStatusesValue
+                            ? "translateY(0%)"
+                            : "translateY(-50%)",
+                        transition: "all 0.2s ease-in-out",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? "#4d5054"
+                            : theme.palette.common.white,
+                        padding: "0 4px",
+                        pointerEvents: "none", // Evita que el label interfiera con el clic del Select
+                      }}
+                    >
+                      Status
+                    </FormLabel>
+
+                    <Select
+                      {...field}
+                      value={
+                        statusOptions.find(
+                          (option) => option.value === field.value?.value
+                        ) || null
+                      }
+                      inputId="statuses-select"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          boxSizing: "border-box",
+                          backgroundColor: "inherit",
+                          marginTop: theme.spacing(2),
+                          padding: theme.spacing(0),
+                          height: "3.5em",
+                          "&:hover:not(:focus-within)": {
+                            borderColor: theme.palette.text.primary,
+                          },
+                          "&:focus-within": {
+                            boxShadow: `inset 0 0 0 1px ${theme.palette.primary.main}`,
+                          },
+                        }),
+                        valueContainer: (base) => ({
+                          ...base,
+                          gap: "0.4em",
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          backgroundColor: theme.palette.background.paper,
+                          color: theme.palette.text.primary,
+                          borderRadius: theme.shape.borderRadius,
+                          boxShadow: theme.shadows[3],
+                          zIndex: 100,
+                        }),
+                        singleValue: (base) => ({
+                          ...base,
+                          color: theme.palette.text.primary,
+                        }),
+                        option: (base, state) => ({
+                          ...base,
+                          backgroundColor: state.isSelected
+                            ? theme.palette.primary.light // Color para los elementos seleccionados
+                            : state.isFocused
+                            ? theme.palette.action.hover // Color cuando el elemento está enfocado
+                            : "transparent",
+                          color: state.isSelected
+                            ? theme.palette.primary.contrastText // Color del texto cuando está seleccionado
+                            : theme.palette.text.primary, // Color del texto por defecto
+                          "&:active": {
+                            backgroundColor: theme.palette.primary.main, // Color de fondo cuando se hace clic
+                          },
+                        }),
+                        input: (base) => ({
+                          ...base,
+                          color: theme.palette.text.primary, // Cambia este valor para definir el color del texto
+                        }),
+                        placeholder: (base, state) => ({
+                          ...base,
+                          color: state.isFocused
+                            ? theme.palette.divider // Color del placeholder cuando está enfocado
+                            : theme.palette.grey[400], // Color del placeholder cuando no está enfocado
+                        }),
+                      }}
+                      menuPlacement="auto"
+                      placeholder=""
+                      isClearable={true}
+                      isDisabled={!taskListTaskItem}
+                      components={{
+                        DropdownIndicator: !taskListTaskItem
+                          ? () => null
+                          : defaultComponents.DropdownIndicator,
+                        IndicatorSeparator: !taskListTaskItem
+                          ? () => null
+                          : defaultComponents.IndicatorSeparator,
+                      }}
+                      options={statusOptions}
+                      classNamePrefix="select"
+                      onFocus={() => setIsStatusesFocused(true)}
+                      onBlur={() => setIsStatusesFocused(false)}
+                      onChange={(option) => {
+                        field.onChange(option ? option : null); // Extrae solo el valor seleccionado
+                        setHasStatusesValue(option != null);
+                      }}
+                    />
+                  </>
                 )}
               />
             </FormControl>
 
             <FormControl fullWidth>
-              <FormLabel
-                htmlFor="tags-select"
-                style={{
-                  position: "absolute",
-                  zIndex: 10,
-                  left: "12px",
-                  top: isTagsFocused || hasTagsValue ? "10%" : "60%",
-                  fontSize:
-                    isTagsFocused || hasTagsValue
-                      ? theme.typography.caption.fontSize
-                      : "1rem",
-                  borderRadius: theme.shape.borderRadius,
-                  color: isTagsFocused
-                    ? theme.palette.primary.main
-                    : theme.palette.text.secondary,
-                  transform:
-                    isTagsFocused || hasTagsValue
-                      ? "translateY(0%)"
-                      : "translateY(-50%)",
-                  transition: "all 0.2s ease-in-out",
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? "#4d5054"
-                      : theme.palette.common.white,
-                  padding: "0 4px",
-                  pointerEvents: "none", // Evita que el label interfiera con el clic del Select
-                }}
-              >
-                Tags
-              </FormLabel>
-
               <Controller
                 name="tags"
                 control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    inputId="tags-select"
-                    styles={{
-                      control: (base) => ({
-                        ...base,
-                        boxSizing: "border-box",
-                        backgroundColor: "inherit",
-                        marginTop: theme.spacing(2),
-                        padding: theme.spacing(0),
-                        height: "3.5em",
-                        "&:hover:not(:focus-within)": {
-                          borderColor: theme.palette.text.primary,
-                        },
-                        "&:focus-within": {
-                          boxShadow: `inset 0 0 0 1px ${theme.palette.primary.main}`,
-                        },
-                      }),
-                      valueContainer: (base) => ({
-                        ...base,
-                        gap: "0.4em",
-                      }),
-                      menu: (base) => ({
-                        ...base,
-                        backgroundColor: theme.palette.background.paper,
-                        color: theme.palette.text.primary,
+                rules={{
+                  required: "One tag is required at least",
+                  validate: (value) =>
+                    (value && value.length > 0) ||
+                    "Please select at least one tag",
+                }}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <FormLabel
+                      htmlFor="tags-select"
+                      style={{
+                        position: "absolute",
+                        zIndex: 10,
+                        left: "12px",
+                        top: isTagsFocused || hasTagsValue ? "10%" : "60%",
+                        fontSize:
+                          isTagsFocused || hasTagsValue
+                            ? theme.typography.caption.fontSize
+                            : "1rem",
                         borderRadius: theme.shape.borderRadius,
-                        boxShadow: theme.shadows[3],
-                        zIndex: 100,
-                      }),
-                      multiValue: (base) => ({
-                        ...base,
-                        textTransform: "capitalize",
-                        backgroundColor: theme.palette.action.selected,
-                        padding: theme.spacing(0.8),
-                      }),
-                      multiValueLabel: (base) => ({
-                        ...base,
-                        color: theme.palette.text.primary,
-                      }),
-                      multiValueRemove: (base) => ({
-                        ...base,
-                        color: theme.palette.error.main,
-                        ":hover": {
-                          backgroundColor: theme.palette.error.light,
-                          color: "white",
-                        },
-                      }),
-                      option: (base, state) => ({
-                        ...base,
-                        textTransform: "capitalize",
-                        backgroundColor: state.isSelected
-                          ? theme.palette.primary.light // Color para los elementos seleccionados
-                          : state.isFocused
-                          ? theme.palette.action.hover // Color cuando el elemento está enfocado
-                          : "transparent",
-                        color: state.isSelected
-                          ? theme.palette.primary.contrastText // Color del texto cuando está seleccionado
-                          : theme.palette.text.primary, // Color del texto por defecto
-                        "&:active": {
-                          backgroundColor: theme.palette.primary.main, // Color de fondo cuando se hace clic
-                        },
-                      }),
-                      input: (base) => ({
-                        ...base,
-                        color: theme.palette.text.primary, // Cambia este valor para definir el color del texto
-                      }),
-                      placeholder: (base, state) => ({
-                        ...base,
-                        color: state.isFocused
-                          ? theme.palette.divider // Color del placeholder cuando está enfocado
-                          : theme.palette.grey[400], // Color del placeholder cuando no está enfocado
-                      }),
-                    }}
-                    menuPlacement="auto"
-                    placeholder=""
-                    isMulti
-                    options={mockTagList.map((tag) => ({
-                      value: tag.Title,
-                      label: tag.Title,
-                    }))}
-                    classNamePrefix="select"
-                    onFocus={() => setIsTagsFocused(true)}
-                    onBlur={() => setIsTagsFocused(false)}
-                    onChange={(value) => {
-                      field.onChange(value);
-                      setHasTagsValue(value.length > 0);
-                    }}
-                  />
+                        color: error
+                          ? theme.palette.error.main
+                          : isTagsFocused
+                          ? theme.palette.primary.main
+                          : theme.palette.text.secondary,
+                        transform:
+                          isTagsFocused || hasTagsValue
+                            ? "translateY(0%)"
+                            : "translateY(-50%)",
+                        transition: "all 0.2s ease-in-out",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? "#4d5054"
+                            : theme.palette.common.white,
+                        padding: "0 4px",
+                        pointerEvents: "none", // Evita que el label interfiera con el clic del Select
+                      }}
+                    >
+                      Tags
+                    </FormLabel>
+
+                    <Select
+                      {...field}
+                      inputId="tags-select"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          boxSizing: "border-box",
+                          backgroundColor: "inherit",
+                          marginTop: theme.spacing(2),
+                          padding: theme.spacing(0),
+                          height: "3.5em",
+                          borderColor: error
+                            ? theme.palette.error.main
+                            : base.borderColor,
+                          "&:hover:not(:focus-within)": {
+                            borderColor: error
+                              ? theme.palette.error.main
+                              : theme.palette.text.primary,
+                          },
+                          "&:focus-within": {
+                            boxShadow: error
+                              ? `inset 0 0 0 1px ${theme.palette.error.main}`
+                              : `inset 0 0 0 1px ${theme.palette.primary.main}`,
+                          },
+                        }),
+                        valueContainer: (base) => ({
+                          ...base,
+                          gap: "0.4em",
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          backgroundColor: theme.palette.background.paper,
+                          color: theme.palette.text.primary,
+                          borderRadius: theme.shape.borderRadius,
+                          boxShadow: theme.shadows[3],
+                          zIndex: 100,
+                        }),
+                        multiValue: (base) => ({
+                          ...base,
+                          textTransform: "capitalize",
+                          backgroundColor: theme.palette.action.selected,
+                          padding: theme.spacing(0.8),
+                        }),
+                        multiValueLabel: (base) => ({
+                          ...base,
+                          color: theme.palette.text.primary,
+                        }),
+                        multiValueRemove: (base) => ({
+                          ...base,
+                          color: theme.palette.error.main,
+                          ":hover": {
+                            backgroundColor: theme.palette.error.light,
+                            color: "white",
+                          },
+                        }),
+                        option: (base, state) => ({
+                          ...base,
+                          textTransform: "capitalize",
+                          backgroundColor: state.isSelected
+                            ? theme.palette.primary.light // Color para los elementos seleccionados
+                            : state.isFocused
+                            ? theme.palette.action.hover // Color cuando el elemento está enfocado
+                            : "transparent",
+                          color: state.isSelected
+                            ? theme.palette.primary.contrastText // Color del texto cuando está seleccionado
+                            : theme.palette.text.primary, // Color del texto por defecto
+                          "&:active": {
+                            backgroundColor: theme.palette.primary.main, // Color de fondo cuando se hace clic
+                          },
+                        }),
+                        input: (base) => ({
+                          ...base,
+                          color: theme.palette.text.primary, // Cambia este valor para definir el color del texto
+                        }),
+                        placeholder: (base, state) => ({
+                          ...base,
+                          color: state.isFocused
+                            ? theme.palette.divider // Color del placeholder cuando está enfocado
+                            : theme.palette.grey[400], // Color del placeholder cuando no está enfocado
+                        }),
+                      }}
+                      menuPlacement="auto"
+                      placeholder=""
+                      isMulti
+                      options={mockTagList.map((tag) => ({
+                        value: tag.Title,
+                        label: tag.Title,
+                      }))}
+                      classNamePrefix="select"
+                      onFocus={() => setIsTagsFocused(true)}
+                      onBlur={() => setIsTagsFocused(false)}
+                      onChange={(value) => {
+                        field.onChange(value);
+                        setHasTagsValue(value.length > 0);
+                      }}
+                    />
+                    {error && (
+                      <Typography
+                        variant="caption"
+                        color="error"
+                        sx={{
+                          marginTop: theme.spacing(0.5),
+                          marginLeft: theme.spacing(2),
+                          marginRight: theme.spacing(2),
+                          position: "absolute",
+                          bottom: "-2em",
+                        }}
+                      >
+                        {error.message}
+                      </Typography>
+                    )}
+                  </>
                 )}
               />
             </FormControl>
@@ -440,7 +484,7 @@ export const TaskForm = () => {
             </Button>
             {taskListTaskItem ? (
               <Button
-                type="submit"
+                type="button"
                 variant="contained"
                 color="error"
                 sx={{ position: "absolute", left: theme.spacing(2) }}

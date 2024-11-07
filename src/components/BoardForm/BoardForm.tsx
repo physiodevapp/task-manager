@@ -150,7 +150,6 @@ export const BoardForm = () => {
                   label="Board name"
                   type="text"
                   fullWidth
-                  required
                   error={!!error}
                   helperText={error ? error.message : ""}
                   variant="outlined"
@@ -238,7 +237,7 @@ export const BoardForm = () => {
             </Button>
             {type === "edit-board" ? (
               <Button
-                type="submit"
+                type="button"
                 variant="contained"
                 color="error"
                 sx={{ position: "absolute", left: theme.spacing(2) }}

@@ -11,7 +11,7 @@ export interface TaskInterface {
   id: string,
   title: string,
   description: string,
-  boardId: number,
+  boardId: string,
   status: string,
   tags?: string[],
 }
