@@ -15,11 +15,11 @@ import {
   BoardArea,
   BoardTitle,
   BoardDeleteIcon,
+  BoardIcon,
 } from "./Board.styled";
 import { BoardColumn } from "../../components/BoardColumn/BoardColumn";
 import { CiDark, CiLight } from "react-icons/ci";
 import { IoIosAddCircle } from "react-icons/io";
-import { FaRegTrashCan } from "react-icons/fa6";
 import { useTheme as useCustomTheme } from "../../context/theme";
 import { useTheme as useStyledTheme } from "styled-components";
 import {
@@ -53,6 +53,16 @@ import { taskListUpdateThunk } from "../../features/taskList/taskListUpdateThunk
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { useForm } from "../../context/form";
 import { boardListDeleteThunk } from "../../features/boardList/boardListDeleteThunk";
+import {
+  LocalAirportOutlined,
+  TrainOutlined,
+  DirectionsCarOutlined,
+  TwoWheelerOutlined,
+  DirectionsBusOutlined,
+  FlightOutlined,
+  SubwayOutlined,
+  DirectionsBoatOutlined,
+} from "@mui/icons-material";
 
 interface ColumnInterface {
   id: string;
@@ -93,6 +103,17 @@ export const Board = () => {
   const taskListError = useAppSelector(taskListErrorSelect);
 
   const baseBoardId = useId();
+
+  const radioItems = [
+    { value: "plane", icon: <LocalAirportOutlined /> },
+    { value: "train", icon: <TrainOutlined /> },
+    { value: "car", icon: <DirectionsCarOutlined /> },
+    { value: "boat", icon: <DirectionsBoatOutlined /> },
+    { value: "motorbike", icon: <TwoWheelerOutlined /> },
+    { value: "bus", icon: <DirectionsBusOutlined /> },
+    { value: "flight", icon: <FlightOutlined /> },
+    { value: "subway", icon: <SubwayOutlined /> },
+  ];
 
   const selectBoard = (board: BoardInterface) => {
     boardListDispatch(setActiveBoardItem(board));
@@ -155,8 +176,7 @@ export const Board = () => {
   const handleDeleteBoard = (event: any, board: BoardInterface) => {
     event.stopPropagation();
 
-    if (board)
-      boardListDispatch(boardListDeleteThunk({ item: board }));
+    if (board) boardListDispatch(boardListDeleteThunk({ item: board }));
   };
 
   useEffect(() => {
@@ -184,10 +204,6 @@ export const Board = () => {
 
         if (true)
           taskListDispatch(taskListReadAllThunk({ boardId: board?.id }));
-
-        // console.log(!boardListBoardItem && board);
-        // if (!board)
-        // setIsLoadingTaskList(false);
 
         setIsLoadingBoardList(false);
         break;
@@ -314,12 +330,18 @@ export const Board = () => {
                   disabled={isLoadingTaskList}
                   $active={boardItem.id === boardListBoardItem?.id}
                 >
-                  {/* <>
-                    {boardItem.title}
-                    <FaRegTrashCan />
-                  </> */}
+                  {boardItem.icon ? (                    
+                    <BoardIcon>
+                      {radioItems.find((icon) => icon.value === boardItem.icon)?.icon}
+                    </BoardIcon>
+                  ) : (
+                    <></>
+                  )}
                   <BoardTitle>{boardItem.title}</BoardTitle>
-                  <BoardDeleteIcon onClick={(event) => handleDeleteBoard(event, boardItem)} />
+                  <BoardDeleteIcon
+                    className="board__delete"
+                    onClick={(event) => handleDeleteBoard(event, boardItem)}
+                  />
                 </BoardItem>
               ))}
               <AddBoard

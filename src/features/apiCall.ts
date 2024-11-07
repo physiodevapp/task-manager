@@ -1,6 +1,6 @@
 
 
-export const getList = <T>(list: T[], boardId?:number): Promise<T[]> => {
+export const getList = <T>(list: T[], boardId?:string): Promise<T[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(list.filter((item: any) => !boardId || item.boardId === boardId));
